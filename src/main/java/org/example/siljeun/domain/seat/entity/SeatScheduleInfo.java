@@ -12,15 +12,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.siljeun.domain.schedule.entity.Schedule;
-import org.example.siljeun.domain.seat.enums.SeatReserveStatus;
+import org.example.siljeun.domain.seat.enums.SeatStatus;
 import org.example.siljeun.global.entity.BaseEntity;
 
 @Entity
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "seat_status")
-public class SeatStatus extends BaseEntity {
+@Table(name = "seat_schedule_info")
+public class SeatScheduleInfo extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,11 +32,11 @@ public class SeatStatus extends BaseEntity {
 
   //회차 정보
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "schedule", nullable = false)
+  @JoinColumn(name = "schedule_id", nullable = false)
   private Schedule schedule;
 
   //상태 (확장성을 위해 우선 enum으로 설정해놓음)
-  private SeatReserveStatus status;
+  private SeatStatus status;
 
   //임시로 String으로 설정
   private String grade;

@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.example.siljeun.domain.seat.entity.SeatStatus;
+import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.user.entity.User;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -33,8 +33,8 @@ public class Reservation {
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "seat_status_id", nullable = false)
-  private SeatStatus seatStatus;
+  @JoinColumn(name = "seat_schedule_info_id", nullable = false)
+  private SeatScheduleInfo seatScheduleInfo;
 
   @Column(nullable = false)
   private int price;
