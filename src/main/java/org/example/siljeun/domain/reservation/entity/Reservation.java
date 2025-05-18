@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import org.example.siljeun.domain.reservation.enums.Discount;
 import org.example.siljeun.domain.reservation.enums.ReservationStatus;
 import org.example.siljeun.domain.reservation.enums.TicketReceipt;
+import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.seat.entity.SeatStatus;
 import org.example.siljeun.domain.user.entity.User;
 import org.springframework.data.annotation.CreatedDate;
@@ -39,8 +40,12 @@ public class Reservation {
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "seat_status_id")
-  private SeatStatus seatStatus;
+  @JoinColumn(name = "schedule_id", nullable = false)
+  private Schedule schedule;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "seat_schedule_info_id")
+  private SeatScheduleInfo seatScheduleInfo;
 
   private int price;
 
@@ -59,4 +64,13 @@ public class Reservation {
   @CreatedDate
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime created_at;
+
+  public Reservation(User user, Schedule schedule) {
+    this.user = user;
+    this.schedule = schedule;
+  }
+
+  public void updateSeatScheduleInfo(SeatScheduleInfo seatScheduleInfo) {
+    this.seatScheduleInfo = seatScheduleInfo;
+  }
 }
