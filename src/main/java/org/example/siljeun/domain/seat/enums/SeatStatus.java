@@ -1,6 +1,6 @@
 package org.example.siljeun.domain.seat.enums;
 
-public enum SeatReserveStatus {
+public enum SeatStatus {
   AVALIABLE,
   UNAVALIABLE
 }

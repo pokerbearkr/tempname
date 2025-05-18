@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 import org.example.siljeun.domain.reservation.enums.Discount;
 import org.example.siljeun.domain.reservation.enums.ReservationStatus;
 import org.example.siljeun.domain.reservation.enums.TicketReceipt;
-import org.example.siljeun.domain.seat.entity.SeatStatus;
+import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.user.entity.User;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -39,8 +39,8 @@ public class Reservation {
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "seat_status_id")
-  private SeatStatus seatStatus;
+  @JoinColumn(name = "seat_schedule_info_id", nullable = false)
+  private SeatScheduleInfo seatScheduleInfo;
 
   private int price;
 
