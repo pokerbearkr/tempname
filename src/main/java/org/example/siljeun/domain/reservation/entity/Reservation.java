@@ -11,16 +11,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.siljeun.domain.reservation.enums.Discount;
+import org.example.siljeun.domain.reservation.enums.ReservationStatus;
+import org.example.siljeun.domain.reservation.enums.TicketReceipt;
 import org.example.siljeun.domain.seat.entity.SeatStatus;
 import org.example.siljeun.domain.user.entity.User;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @Getter
 @NoArgsConstructor
@@ -58,16 +59,4 @@ public class Reservation {
   @CreatedDate
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime created_at;
-
-  public enum TicketReceipt {
-    DELIVERY, PICKUP
-  }
-
-  public enum Discount {
-    GENERAL, SEVERELY, MILDLY, NATIONAL_MERIT // 일반, 중증, 경증, 국가유공자
-  }
-
-  public enum ReservationStatus {
-    PENDING, COMPLETE
-  }
 }
