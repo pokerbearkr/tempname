@@ -19,7 +19,7 @@ import org.example.siljeun.domain.reservation.enums.Discount;
 import org.example.siljeun.domain.reservation.enums.ReservationStatus;
 import org.example.siljeun.domain.reservation.enums.TicketReceipt;
 import org.example.siljeun.domain.schedule.entity.Schedule;
-import org.example.siljeun.domain.seat.entity.SeatStatus;
+import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.user.entity.User;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

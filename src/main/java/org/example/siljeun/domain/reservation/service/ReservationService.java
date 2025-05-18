@@ -5,6 +5,7 @@ import org.example.siljeun.domain.reservation.entity.Reservation;
 import org.example.siljeun.domain.reservation.repository.ReservationRepository;
 import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
+import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,5 +33,5 @@ public class ReservationService {
     reservation.updateSeatScheduleInfo(seatScheduleInfo);
   }
 
-  
+
 }
