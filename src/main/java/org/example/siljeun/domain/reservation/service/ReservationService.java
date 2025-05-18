@@ -16,7 +16,6 @@ public class ReservationService {
 
   private final ReservationRepository reservationRepository;
   private final ScheduleRepository scheduleRepository;
-  private final SeatScheduleInfo seatScheduleInfo;
 
   // Todo : 예외처리
 
@@ -27,11 +26,15 @@ public class ReservationService {
     reservationRepository.save(reservation);
   }
 
-  // 좌석 도메인에서 호출할 메서드(해당 도메인에서 reservation Repo에 reservationId가 존재하는지 확인 필요)
+  // 좌석 도메인에서 호출할 메서드(해당 도메인에서 reservation Repo에 reservationId가 존재하는지 확인하는 과정 필요) - 예매 테이블에 좌석 정보 저장
   @Transactional
   public void saveSeatInfo(Reservation reservation, SeatScheduleInfo seatScheduleInfo) {
     reservation.updateSeatScheduleInfo(seatScheduleInfo);
   }
 
-
+  // 결제 도메인에서 호출할 메서드 - 결제완료 처리
+  @Transactional
+  public void updateReservationStatus(Reservation reservation) {
+    reservation.updateReservationStatus();
+  }
 }

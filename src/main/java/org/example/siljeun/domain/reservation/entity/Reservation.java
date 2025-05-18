@@ -68,9 +68,17 @@ public class Reservation {
   public Reservation(User user, Schedule schedule) {
     this.user = user;
     this.schedule = schedule;
+    this.ticketReceipt = TicketReceipt.PICKUP;
+    this.discount = Discount.GENERAL;
+    this.status = ReservationStatus.PENDING;
   }
 
   public void updateSeatScheduleInfo(SeatScheduleInfo seatScheduleInfo) {
     this.seatScheduleInfo = seatScheduleInfo;
+    this.price = seatScheduleInfo.getPrice();
+  }
+
+  public void updateReservationStatus() {
+    this.status = ReservationStatus.COMPLETE;
   }
 }
