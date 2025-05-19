@@ -1,5 +1,6 @@
 package org.example.siljeun.domain.reservation.entity;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -15,12 +16,14 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.siljeun.domain.reservation.dto.request.UpdatePriceRequest;
 import org.example.siljeun.domain.reservation.enums.Discount;
 import org.example.siljeun.domain.reservation.enums.ReservationStatus;
 import org.example.siljeun.domain.reservation.enums.TicketReceipt;
 import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.user.entity.User;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -29,6 +32,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "reservation")
 @EntityListeners(AuditingEntityListener.class)
+@DynamicUpdate
 public class Reservation {
 
   @Id
@@ -73,12 +77,21 @@ public class Reservation {
     this.status = ReservationStatus.PENDING;
   }
 
-  public void updateSeatScheduleInfo(SeatScheduleInfo seatScheduleInfo) {
+  public void saveSeatScheduleInfo(SeatScheduleInfo seatScheduleInfo) {
     this.seatScheduleInfo = seatScheduleInfo;
     this.price = seatScheduleInfo.getPrice();
   }
 
   public void updateReservationStatus() {
     this.status = ReservationStatus.COMPLETE;
+  }
+
+  public void updateTicketPrice(UpdatePriceRequest dto) {
+    if (!StringUtils.isBlank(dto.ticketReceipt())) {
+      this.ticketReceipt = TicketReceipt.valueOf(dto.ticketReceipt());
+    }
+    if (!StringUtils.isBlank(dto.discount())) {
+      this.discount = Discount.valueOf(dto.discount());
+    }
   }
 }
