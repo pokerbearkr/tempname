@@ -30,6 +30,8 @@ public class Seat {
 
   private String section;
   private String row;
+  private String column;
   private String number;
-
+  private String defaultGrade;
+  private int defaultPrice;
 }

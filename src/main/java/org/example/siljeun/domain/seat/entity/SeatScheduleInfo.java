@@ -35,12 +35,7 @@ public class SeatScheduleInfo extends BaseEntity {
   @JoinColumn(name = "schedule_id", nullable = false)
   private Schedule schedule;
 
-  //상태 (확장성을 위해 우선 enum으로 설정해놓음)
   private SeatStatus status;
-
-  //임시로 String으로 설정
   private String grade;
-
   private int price;
-
 }
