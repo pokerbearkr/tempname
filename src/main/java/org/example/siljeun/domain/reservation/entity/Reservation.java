@@ -20,7 +20,6 @@ import org.example.siljeun.domain.reservation.dto.request.UpdatePriceRequest;
 import org.example.siljeun.domain.reservation.enums.Discount;
 import org.example.siljeun.domain.reservation.enums.ReservationStatus;
 import org.example.siljeun.domain.reservation.enums.TicketReceipt;
-import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.user.entity.User;
 import org.hibernate.annotations.DynamicUpdate;
@@ -44,13 +43,10 @@ public class Reservation {
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "schedule_id", nullable = false)
-  private Schedule schedule;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "seat_schedule_info_id")
+  @JoinColumn(name = "seat_schedule_info_id", nullable = false)
   private SeatScheduleInfo seatScheduleInfo;
 
+  @Column(nullable = false)
   private int price;
 
   @Column(nullable = false)
@@ -69,17 +65,13 @@ public class Reservation {
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime created_at;
 
-  public Reservation(User user, Schedule schedule) {
+  public Reservation(User user, SeatScheduleInfo seatScheduleInfo) {
     this.user = user;
-    this.schedule = schedule;
+    this.seatScheduleInfo = seatScheduleInfo;
+    this.price = seatScheduleInfo.getPrice();
     this.ticketReceipt = TicketReceipt.PICKUP;
     this.discount = Discount.GENERAL;
     this.status = ReservationStatus.PENDING;
-  }
-
-  public void saveSeatScheduleInfo(SeatScheduleInfo seatScheduleInfo) {
-    this.seatScheduleInfo = seatScheduleInfo;
-    this.price = seatScheduleInfo.getPrice();
   }
 
   public void updateReservationStatus() {
