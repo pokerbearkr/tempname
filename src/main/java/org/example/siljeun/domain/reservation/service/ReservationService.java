@@ -3,6 +3,8 @@ package org.example.siljeun.domain.reservation.service;
 import lombok.RequiredArgsConstructor;
 import org.example.siljeun.domain.reservation.dto.request.UpdatePriceRequest;
 import org.example.siljeun.domain.reservation.entity.Reservation;
+import org.example.siljeun.domain.reservation.exception.ErrorCode;
+import org.example.siljeun.domain.reservation.exception.ReservationCustomException;
 import org.example.siljeun.domain.reservation.repository.ReservationRepository;
 import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
@@ -44,10 +46,10 @@ public class ReservationService {
   public void updatePrice(Long reservationId, UpdatePriceRequest requestDto) {
     User user = null; // Todo : User 데이터 DB에 있는지 확인
     Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(
-        RuntimeException::new);
+        () -> new ReservationCustomException(ErrorCode.NOT_FOUND_RESERVATION));
 
     if (reservation.getUser() != user) {
-      throw new RuntimeException();
+      throw new ReservationCustomException(ErrorCode.INVALID_RESERVATION_USER);
     }
 
     reservation.updateTicketPrice(requestDto);
@@ -56,7 +58,7 @@ public class ReservationService {
   @Transactional
   public void delete(Long reservationId) {
     Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(
-        RuntimeException::new);
+        () -> new ReservationCustomException(ErrorCode.NOT_FOUND_RESERVATION));
 
     reservationRepository.delete(reservation);
     // Todo : seatScheduleInfo 테이블에 해당 좌석 선택가능으로 변경
