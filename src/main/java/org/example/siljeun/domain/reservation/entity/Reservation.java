@@ -2,6 +2,7 @@ package org.example.siljeun.domain.reservation.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -14,14 +15,19 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.siljeun.domain.reservation.enums.Discount;
+import org.example.siljeun.domain.reservation.enums.ReservationStatus;
+import org.example.siljeun.domain.reservation.enums.TicketReceipt;
 import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.user.entity.User;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @NoArgsConstructor
 @Entity
 @Table(name = "reservation")
+@EntityListeners(AuditingEntityListener.class)
 public class Reservation {
 
   @Id
@@ -36,16 +42,15 @@ public class Reservation {
   @JoinColumn(name = "seat_schedule_info_id", nullable = false)
   private SeatScheduleInfo seatScheduleInfo;
 
-  @Column(nullable = false)
   private int price;
 
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
-  private DeliveryFee deliveryFee;
+  private TicketReceipt ticketReceipt;
 
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
-  private DiscountRate discountRate;
+  private Discount discount;
 
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
@@ -54,16 +59,4 @@ public class Reservation {
   @CreatedDate
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime created_at;
-
-  public enum DeliveryFee {
-    DELIVERY, PICKUP
-  }
-
-  public enum DiscountRate {
-    GENERAL, SEVERELY, MILDLY, NATIONAL_MERIT // 일반, 중증, 경증, 국가유공자
-  }
-
-  public enum ReservationStatus {
-    PENDING, COMPLETE
-  }
 }
