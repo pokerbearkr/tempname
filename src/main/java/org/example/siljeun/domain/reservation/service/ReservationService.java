@@ -23,6 +23,7 @@ public class ReservationService {
   public void create(Long scheduleId) {
     User user = null; // Todo : User 데이터 DB에 있는지 확인
     Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(RuntimeException::new);
+    // Todo : 티켓팅 가능 시간인지 확인
     Reservation reservation = new Reservation(user, schedule);
     reservationRepository.save(reservation);
   }
@@ -50,5 +51,14 @@ public class ReservationService {
     }
 
     reservation.updateTicketPrice(requestDto);
+  }
+
+  @Transactional
+  public void delete(Long reservationId) {
+    Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(
+        RuntimeException::new);
+
+    reservationRepository.delete(reservation);
+    // Todo : seatScheduleInfo 테이블에 해당 좌석 선택가능으로 변경
   }
 }
