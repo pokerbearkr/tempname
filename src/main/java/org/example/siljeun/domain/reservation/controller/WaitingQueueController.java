@@ -15,7 +15,7 @@ public class WaitingQueueController {
   @MessageMapping("/addQueue")
   public void addQueue(AddQueueRequest request) {
     Long scheduleId = request.scheduleId();
-    Long userId = request.userId();
-    waitingQueueService.addQueue(scheduleId, userId);
+    String username = request.username();
+    waitingQueueService.addQueue(scheduleId, username);
   }
 }

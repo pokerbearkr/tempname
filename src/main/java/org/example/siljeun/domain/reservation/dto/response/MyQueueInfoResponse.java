@@ -2,7 +2,7 @@ package org.example.siljeun.domain.reservation.dto.response;
 
 public record MyQueueInfoResponse(
     Long scheduleId,
-    Long userId,
+    String username,
     Long rank,
     Long acceptedRank
 ) {
