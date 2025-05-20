@@ -10,5 +10,4 @@ public record SeatCreateRequest(
         @NotBlank String defaultGrade,
         @Min(0) int defaultPrice
 ) {
-
 }

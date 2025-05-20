@@ -8,5 +8,4 @@ public record SeatScheduleUpdateStatusRequest(
         @NotNull Long seatScheduleInfoId,
         @NotNull SeatStatus status
 ) {
-
 }
