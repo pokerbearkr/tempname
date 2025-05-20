@@ -14,7 +14,7 @@ import org.example.siljeun.domain.venue.entity.Venue;
 @Table(
     name = "seat",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"venue_id", "section", "row", "column"}) //O공연장의 O구역 O열 O좌석은 고유하다
+        @UniqueConstraint(columnNames = {"venue_id", "section", "seat_row", "seat_column"}) //O공연장의 O구역 O열 O좌석은 고유하다
     }
 )
 public class Seat {
@@ -29,7 +29,9 @@ public class Seat {
     private Venue venue;
 
     private String section;
+    @Column(name = "seat_row")
     private String row;
+    @Column(name = "seat_column")
     private String column;
     private String defaultGrade;
     private int defaultPrice;
