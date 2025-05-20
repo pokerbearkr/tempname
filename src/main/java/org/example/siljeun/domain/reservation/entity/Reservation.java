@@ -1,5 +1,8 @@
 package org.example.siljeun.domain.reservation.entity;
 
+import static org.example.siljeun.domain.reservation.enums.ReservationStatus.COMPLETE;
+import static org.example.siljeun.domain.reservation.enums.ReservationStatus.PENDING;
+
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -63,7 +66,7 @@ public class Reservation {
 
   @CreatedDate
   @Column(name = "created_at", nullable = false, updatable = false)
-  private LocalDateTime created_at;
+  private LocalDateTime createdAt;
 
   public Reservation(User user, SeatScheduleInfo seatScheduleInfo) {
     this.user = user;
@@ -71,11 +74,12 @@ public class Reservation {
     this.price = seatScheduleInfo.getPrice();
     this.ticketReceipt = TicketReceipt.PICKUP;
     this.discount = Discount.GENERAL;
-    this.status = ReservationStatus.PENDING;
+    this.status = PENDING;
   }
 
-  public void updateReservationStatus() {
-    this.status = ReservationStatus.COMPLETE;
+  public void updateReservationStatus(Reservation reservation) {
+    this.status = (reservation.status == PENDING) ?
+        COMPLETE : PENDING;
   }
 
   public void updateTicketPrice(UpdatePriceRequest dto) {
