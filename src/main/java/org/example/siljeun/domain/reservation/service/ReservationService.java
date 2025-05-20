@@ -51,5 +51,6 @@ public class ReservationService {
         () -> new ReservationCustomException(ErrorCode.NOT_FOUND_RESERVATION));
 
     reservationRepository.delete(reservation);
+    // 좌석 상태 변경
   }
 }

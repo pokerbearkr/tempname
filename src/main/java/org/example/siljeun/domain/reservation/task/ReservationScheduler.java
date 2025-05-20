@@ -6,11 +6,9 @@ import org.example.siljeun.domain.reservation.enums.ReservationStatus;
 import org.example.siljeun.domain.reservation.repository.ReservationRepository;
 import org.example.siljeun.domain.reservation.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@EnableScheduling
 @Component
 public class ReservationScheduler {
 
