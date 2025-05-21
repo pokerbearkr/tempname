@@ -20,7 +20,6 @@ public class ReservationScheduler {
   public void returnSeat() {
     LocalDateTime now = LocalDateTime.now();
 
-    // Todo : 성능 개선
     reservationRepository.findByStatus(ReservationStatus.PENDING).stream()
         .filter(reservation -> ChronoUnit.MINUTES.between(reservation.getCreatedAt(), now) >= 7)
         .forEach(reservationService::deleteByScheduling);

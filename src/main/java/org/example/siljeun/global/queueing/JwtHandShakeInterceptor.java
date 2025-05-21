@@ -1,23 +1,28 @@
 package org.example.siljeun.global.queueing;
 
 import io.micrometer.common.util.StringUtils;
+import java.net.URI;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.example.siljeun.domain.reservation.exception.ErrorCode;
 import org.example.siljeun.domain.reservation.exception.CustomException;
+import org.example.siljeun.domain.reservation.exception.ErrorCode;
+import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
 import org.example.siljeun.global.jwt.JwtUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 @RequiredArgsConstructor
 public class JwtHandShakeInterceptor implements HandshakeInterceptor {
 
   private final JwtUtil jwtUtil;
+  private final ScheduleRepository scheduleRepository;
 
   // 소켓 연결 시도 직전에 동작
   @Override
@@ -39,9 +44,13 @@ public class JwtHandShakeInterceptor implements HandshakeInterceptor {
     String username = jwtUtil.getUsername(jwt);
     attributes.put("username", username);
 
-    // Todo : STOMP 테스트 실패 여부에 따라 헤더가 아니라 uri 추출 방식으로 변경
-    String scheduleId = headers.getFirst("scheduleId");
-    if (StringUtils.isBlank(scheduleId)) {
+    URI uri = request.getURI();
+    MultiValueMap<String, String> params = UriComponentsBuilder.fromUri(uri).build()
+        .getQueryParams();
+    String scheduleId = params.getFirst("scheduleId");
+
+    if (StringUtils.isBlank(scheduleId) || !scheduleRepository.existsById(
+        Long.valueOf(scheduleId))) {
       throw new CustomException(ErrorCode.MISSING_HEADER);
     }
     attributes.put("scheduleId", scheduleId);

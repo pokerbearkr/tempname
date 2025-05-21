@@ -58,7 +58,6 @@ public class WaitingQueueService {
     redisTemplate.opsForZSet().remove(prefixKey + scheduleId, username);
     log.info("Disconnected and removed Schedule: {}, User: {}", scheduleId, username);
 
-    // Todo : 스케줄러나 Lua 스크립트 고려
     // TTL 만료된 데이터 삭제
     redisTemplate.opsForZSet()
         .removeRangeByScore(prefixKey + scheduleId, 0, System.currentTimeMillis());
