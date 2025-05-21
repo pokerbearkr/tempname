@@ -21,19 +21,12 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      # secrets 내용을 읽어 application.yml 파일을 생성
-      - name: Make application.yml
+      - name: Make application.properties
         run: |
           mkdir -p ./src/main/resources
-          cat <<EOF > ./src/main/resources/application.yml
-toss:
-  client-key: "${{ secrets.TOSS_CLIENT_KEY }}"
-  secret-key: "${{ secrets.TOSS_SECRET_KEY }}"
-
-jwt:
-  secret:
-    key: "${{ secrets.JWT_SECRET_KEY }}"
-EOF
+          echo "toss.client-key=${{ secrets.TOSS_CLIENT_KEY }}" >> ./src/main/resources/application.properties
+          echo "toss.secret-key=${{ secrets.TOSS_SECRET_KEY }}" >> ./src/main/resources/application.properties
+          echo "jwt.secret.key=${{ secrets.JWT_SECRET_KEY }}" >> ./src/main/resources/application.properties
 
       - name: Build Project
         run: ./gradlew clean build
