@@ -50,4 +50,12 @@ public class SeatScheduleInfo extends BaseEntity {
     public static SeatScheduleInfo from(Seat seat, Schedule schedule, SeatStatus status, String grade, int price) {
         return new SeatScheduleInfo(seat, schedule, status, grade, price);
     }
+
+    public void updateSeatScheduleInfoStatus(SeatStatus status){
+        this.status = status;
+    }
+
+    public boolean isAvailable(){
+        return this.status == SeatStatus.AVAILABLE;
+    }
 }
