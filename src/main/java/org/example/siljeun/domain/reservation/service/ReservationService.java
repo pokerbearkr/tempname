@@ -1,6 +1,7 @@
 package org.example.siljeun.domain.reservation.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.siljeun.domain.reservation.dto.response.ReservationInfoResponse;
 import org.example.siljeun.domain.reservation.dto.request.UpdatePriceRequest;
 import org.example.siljeun.domain.reservation.entity.Reservation;
 import org.example.siljeun.domain.reservation.exception.ErrorCode;
@@ -49,11 +50,36 @@ public class ReservationService {
   }
 
   @Transactional
-  public void delete(Long reservationId) {
+  public void delete(String username, Long reservationId) {
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
     Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(
         () -> new CustomException(ErrorCode.NOT_FOUND_RESERVATION));
 
+    if (reservation.getUser() != user) {
+      throw new CustomException(ErrorCode.INVALID_RESERVATION_USER);
+    }
+
     reservationRepository.delete(reservation);
     // Todo : 좌석 상태 변경
+  }
+
+  @Transactional
+  public void deleteByScheduling(Reservation reservation) {
+    reservationRepository.delete(reservation);
+    // Todo : 좌석 상태 변경
+  }
+
+  public ReservationInfoResponse findById(String username, Long reservationId) {
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+    Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(
+        () -> new CustomException(ErrorCode.NOT_FOUND_RESERVATION));
+
+    if (reservation.getUser() != user) {
+      throw new CustomException(ErrorCode.INVALID_RESERVATION_USER);
+    }
+
+    return ReservationInfoResponse.from(reservation);
   }
 }
