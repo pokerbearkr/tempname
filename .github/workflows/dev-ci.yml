@@ -33,10 +33,10 @@ toss:
 jwt:
   secret:
     key: "${{ secrets.JWT_SECRET_KEY }}"
-  EOF
+EOF
 
-- name: Build Project
-  run: ./gradlew clean build
+      - name: Build Project
+        run: ./gradlew clean build
 
-- name: Run Tests
-  run: ./gradlew test
+      - name: Run Tests
+        run: ./gradlew test
