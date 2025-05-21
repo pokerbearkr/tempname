@@ -1,8 +1,8 @@
 package org.example.siljeun.domain.auth.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.siljeun.domain.auth.dto.LoginRequestDto;
-import org.example.siljeun.domain.auth.dto.LoginResponseDto;
+import org.example.siljeun.domain.auth.dto.LoginRequest;
+import org.example.siljeun.domain.auth.dto.LoginResponse;
 import org.example.siljeun.domain.auth.service.AuthService;
 import org.example.siljeun.global.dto.ResponseDto;
 import org.springframework.stereotype.Controller;
@@ -18,9 +18,9 @@ public class AuthController {
   private final AuthService authService;
 
   @PostMapping("/login")
-  public ResponseDto<LoginResponseDto> login(@RequestBody LoginRequestDto request) {
+  public ResponseDto<LoginResponse> login(@RequestBody LoginRequest request) {
     try {
-      LoginResponseDto response = authService.login(request.username(), request.password());
+      LoginResponse response = authService.login(request.username(), request.password());
       return ResponseDto.success("로그인 성공", response);
     } catch (Exception e) {
       return ResponseDto.fail("아이디 또는 비밀번호가 올바르지 않습니다.");

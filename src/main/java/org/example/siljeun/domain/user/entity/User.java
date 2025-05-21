@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import lombok.Builder;
 import lombok.Getter;
 import org.example.siljeun.domain.user.enums.Provider;
 import org.example.siljeun.domain.user.enums.Role;
@@ -32,7 +33,10 @@ public class User extends BaseEntity {
   @Column(nullable = false, length = 255)
   private String password;
 
-  @Column(nullable = false, length = 255)
+  @Column(nullable = false, length = 10)
+  private String nickname;
+
+  @Column(length = 255)
   private String address;
 
   @Enumerated(EnumType.STRING)
@@ -43,9 +47,15 @@ public class User extends BaseEntity {
   @Column(nullable = false)
   private Provider provider;
 
-  @Column(name = "provider_id", length = 255)
-  private String providerId;
+  private Long providerId;
 
   private LocalDateTime deletedAt;
+
+  public User(String email, String nickname, Provider provider, Long providerId) {
+    this.email = email;
+    this.nickname = nickname;
+    this.provider = provider;
+    this.providerId = providerId;
+  }
 
 }

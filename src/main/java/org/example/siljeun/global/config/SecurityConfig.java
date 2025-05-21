@@ -2,8 +2,9 @@ package org.example.siljeun.global.config;
 
 import lombok.RequiredArgsConstructor;
 import org.example.siljeun.domain.user.service.CustomUserDetailsService;
-import org.example.siljeun.global.jwt.JwtAuthenticationFilter;
-import org.example.siljeun.global.jwt.JwtUtil;
+import org.example.siljeun.global.security.CustomOAuth2SuccessHandler;
+import org.example.siljeun.global.security.JwtAuthenticationFilter;
+import org.example.siljeun.global.security.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -19,16 +20,23 @@ public class SecurityConfig {
 
   private final JwtUtil jwtUtil;
   private final CustomUserDetailsService userDetailsService;
+  private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .csrf(csrf -> csrf.disable())
+        .formLogin(form -> form.disable())
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/auth/**", "/oauth2/**", "/login/**").permitAll()
             .anyRequest().authenticated()
+        )
+        .oauth2Login(oauth2 -> oauth2
+            .successHandler(customOAuth2SuccessHandler)
+            .defaultSuccessUrl("/auth/oauth2/success", true)
+            .failureUrl("/auth/oauth2/failure")
         )
         .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userDetailsService),
             UsernamePasswordAuthenticationFilter.class);

@@ -1,4 +1,4 @@
-package org.example.siljeun.global.jwt;
+package org.example.siljeun.global.security;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
