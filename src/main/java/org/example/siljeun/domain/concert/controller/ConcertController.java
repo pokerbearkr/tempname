@@ -9,13 +9,14 @@ import org.example.siljeun.domain.concert.dto.request.ConcertUpdateRequest;
 import org.example.siljeun.domain.concert.dto.response.ConcertDetailResponse;
 import org.example.siljeun.domain.concert.dto.response.ConcertSimpleResponse;
 import org.example.siljeun.domain.concert.service.ConcertService;
+import org.example.siljeun.global.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,9 +31,9 @@ public class ConcertController {
   @PostMapping
   public ResponseEntity<Long> createConcert(
       @RequestBody @Valid ConcertCreateRequest request,
-      @RequestAttribute("userId") Long userId
+      @AuthenticationPrincipal CustomUserDetails userDetails
   ) {
-    Long concertId = concertService.createConcert(request, userId);
+    Long concertId = concertService.createConcert(request, userDetails.getUserId());
     return ResponseEntity.created(URI.create("/concerts" + concertId)).body(concertId);
   }
 
