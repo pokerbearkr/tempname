@@ -4,7 +4,7 @@ import java.util.List;
 import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
+public interface ScheduleRepository extends JpaRepository<Schedule, Long>, ScheduleQueryRepository {
 
   List<Schedule> findByConcertId(Long concertId);
 }
