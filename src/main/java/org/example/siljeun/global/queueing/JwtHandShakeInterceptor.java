@@ -8,7 +8,6 @@ import org.example.siljeun.domain.reservation.exception.CustomException;
 import org.example.siljeun.domain.reservation.exception.ErrorCode;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
 import org.example.siljeun.global.security.JwtUtil;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -24,7 +23,6 @@ public class JwtHandShakeInterceptor implements HandshakeInterceptor {
   private final JwtUtil jwtUtil;
   private final ScheduleRepository scheduleRepository;
 
-  // 소켓 연결 시도 직전에 동작
   @Override
   public boolean beforeHandshake(
       ServerHttpRequest request,
@@ -32,36 +30,31 @@ public class JwtHandShakeInterceptor implements HandshakeInterceptor {
       WebSocketHandler wsHandler,
       Map<String, Object> attributes) throws Exception {
 
-    HttpHeaders headers = request.getHeaders();
-    String bearer = headers.getFirst("Authorization");
-
-    if (bearer == null || !bearer.startsWith(JwtUtil.BEARER_PREFIX)) {
-      throw new CustomException(ErrorCode.UNAUTHORIZED);
-    }
-
-    String jwt = bearer.substring(JwtUtil.BEARER_PREFIX.length());
-    if (!jwtUtil.validateToken(jwt)) {
-      return false;
-    }
- 
-    String username = jwtUtil.getUsername(jwt);
-    attributes.put("username", username);
-
     URI uri = request.getURI();
     MultiValueMap<String, String> params = UriComponentsBuilder.fromUri(uri).build()
         .getQueryParams();
+
     String scheduleId = params.getFirst("scheduleId");
 
     if (StringUtils.isBlank(scheduleId) || !scheduleRepository.existsById(
         Long.valueOf(scheduleId))) {
       throw new CustomException(ErrorCode.MISSING_HEADER);
     }
+
     attributes.put("scheduleId", scheduleId);
+
+    String jwt = params.getFirst("token");
+
+    if (!jwtUtil.validateToken(jwt)) {
+      return false;
+    }
+
+    String username = jwtUtil.getUsername(jwt);
+    attributes.put("username", username);
 
     return true;
   }
 
-  // 소켓 연결된 직후 동작
   @Override
   public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
       WebSocketHandler wsHandler, Exception exception) {

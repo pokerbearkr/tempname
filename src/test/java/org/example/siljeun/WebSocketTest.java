@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.example.siljeun.domain.concert.entity.Concert;
 import org.example.siljeun.domain.concert.entity.ConcertCategory;
@@ -28,9 +27,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import org.springframework.web.socket.sockjs.client.SockJsClient;
-import org.springframework.web.socket.sockjs.client.Transport;
-import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -71,12 +67,12 @@ public class WebSocketTest {
   @Test
   void socket_connection_test() throws Exception {
 
-    List<Transport> transports = List.of(new WebSocketTransport(new StandardWebSocketClient()));
-    SockJsClient sockJsClient = new SockJsClient(transports);
-    WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
+    WebSocketStompClient stompClient = new WebSocketStompClient(new StandardWebSocketClient());
     stompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
-    URI uri = new URI("ws://localhost:" + port + "/ws?scheduleId=" + savedSchedule.getId());
+    URI uri = new URI(
+        "ws://localhost:" + port + "/ws?scheduleId=" + savedSchedule.getId() + "&token="
+            + validToken);
 
     WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
     webSocketHttpHeaders.add("Authorization", JwtUtil.BEARER_PREFIX + validToken);
@@ -86,7 +82,7 @@ public class WebSocketTest {
     StompSession session = stompClient.connectAsync(uri, webSocketHttpHeaders, stompHeaders,
         new StompSessionHandlerAdapter() {
         }
-    ).get(100, TimeUnit.SECONDS);
+    ).get(5, TimeUnit.SECONDS);
 
     assertTrue(session.isConnected());
   }

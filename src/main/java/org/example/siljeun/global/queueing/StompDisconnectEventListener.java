@@ -18,7 +18,7 @@ public class StompDisconnectEventListener {
     StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
 
     String username = (String) accessor.getSessionAttributes().get("username");
-    Long scheduleId = (Long) accessor.getSessionAttributes().get("scheduleId");
+    Long scheduleId = Long.valueOf((String) accessor.getSessionAttributes().get("scheduleId"));
 
     if (username != null && scheduleId != null) {
       waitingQueueService.deleteAtQueue(scheduleId, username);
