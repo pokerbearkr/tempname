@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.siljeun.domain.reservation.exception.CustomException;
 import org.example.siljeun.domain.reservation.exception.ErrorCode;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
-import org.example.siljeun.global.jwt.JwtUtil;
+import org.example.siljeun.global.security.JwtUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -40,7 +40,10 @@ public class JwtHandShakeInterceptor implements HandshakeInterceptor {
     }
 
     String jwt = bearer.substring(JwtUtil.BEARER_PREFIX.length());
-    jwtUtil.validateToken(jwt);
+    if (!jwtUtil.validateToken(jwt)) {
+      return false;
+    }
+ 
     String username = jwtUtil.getUsername(jwt);
     attributes.put("username", username);
 

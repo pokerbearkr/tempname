@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.example.siljeun.domain.concert.entity.Concert;
 import org.example.siljeun.domain.concert.entity.ConcertCategory;
@@ -12,7 +13,7 @@ import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
 import org.example.siljeun.domain.venue.entity.Venue;
 import org.example.siljeun.domain.venue.repository.VenueRepository;
-import org.example.siljeun.global.jwt.JwtUtil;
+import org.example.siljeun.global.security.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
+import org.springframework.web.socket.sockjs.client.SockJsClient;
+import org.springframework.web.socket.sockjs.client.Transport;
+import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -67,19 +71,22 @@ public class WebSocketTest {
   @Test
   void socket_connection_test() throws Exception {
 
-    WebSocketStompClient stompClient = new WebSocketStompClient(new StandardWebSocketClient());
+    List<Transport> transports = List.of(new WebSocketTransport(new StandardWebSocketClient()));
+    SockJsClient sockJsClient = new SockJsClient(transports);
+    WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
     stompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
     URI uri = new URI("ws://localhost:" + port + "/ws?scheduleId=" + savedSchedule.getId());
 
     WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
-    StompHeaders stompHeaders = new StompHeaders();
     webSocketHttpHeaders.add("Authorization", JwtUtil.BEARER_PREFIX + validToken);
+
+    StompHeaders stompHeaders = new StompHeaders();
 
     StompSession session = stompClient.connectAsync(uri, webSocketHttpHeaders, stompHeaders,
         new StompSessionHandlerAdapter() {
         }
-    ).get(5, TimeUnit.SECONDS);
+    ).get(100, TimeUnit.SECONDS);
 
     assertTrue(session.isConnected());
   }
