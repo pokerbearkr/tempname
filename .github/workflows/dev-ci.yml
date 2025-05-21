@@ -27,8 +27,6 @@ jobs:
           echo "toss.client-key=${{ secrets.TOSS_CLIENT_KEY }}" >> ./src/main/resources/application.properties
           echo "toss.secret-key=${{ secrets.TOSS_SECRET_KEY }}" >> ./src/main/resources/application.properties
           echo "jwt.secret.key=${{ secrets.JWT_SECRET_KEY }}" >> ./src/main/resources/application.properties
-          echo "spring.redis.host=${{ secrets.REDIS_HOST }}" >> ./src/main/resources/application.properties
-          echo "spring.redis.port=${{ secrets.REDIS_PORT }}" >> ./src/main/resources/application.properties
 
       - name: Build Project
         run: ./gradlew clean build
