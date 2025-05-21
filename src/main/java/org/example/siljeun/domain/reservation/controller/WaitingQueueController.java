@@ -15,9 +15,9 @@ public class WaitingQueueController {
 
   @MessageMapping("/addQueue")
   public void addQueue(@Valid AddQueueRequest request) {
-//    Long scheduleId = request.scheduleId();
-//    String username = request.username();
-//    waitingQueueService.addQueue(scheduleId, username);
+    Long scheduleId = request.scheduleId();
+    String username = request.username();
+    waitingQueueService.addQueue(scheduleId, username);
     System.out.println("연결 성공");
   }
 }
