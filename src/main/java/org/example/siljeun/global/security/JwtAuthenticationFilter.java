@@ -1,4 +1,4 @@
-package org.example.siljeun.global.jwt;
+package org.example.siljeun.global.security;
 
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
