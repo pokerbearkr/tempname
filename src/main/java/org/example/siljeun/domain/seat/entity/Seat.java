@@ -1,5 +1,6 @@
 package org.example.siljeun.domain.seat.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,6 +30,8 @@ public class Seat {
   private Venue venue;
 
   private String section;
+
+  @Column(name = "`row`")
   private String row;
   private String number;
 
