@@ -9,7 +9,7 @@ import org.example.siljeun.domain.concert.dto.request.ConcertUpdateRequest;
 import org.example.siljeun.domain.concert.dto.response.ConcertDetailResponse;
 import org.example.siljeun.domain.concert.dto.response.ConcertSimpleResponse;
 import org.example.siljeun.domain.concert.service.ConcertService;
-import org.example.siljeun.global.security.CustomUserDetails;
+import org.example.siljeun.global.security.PrincipalDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,7 +31,7 @@ public class ConcertController {
   @PostMapping
   public ResponseEntity<Long> createConcert(
       @RequestBody @Valid ConcertCreateRequest request,
-      @AuthenticationPrincipal CustomUserDetails userDetails
+      @AuthenticationPrincipal PrincipalDetails userDetails
   ) {
     Long concertId = concertService.createConcert(request, userDetails.getUserId());
     return ResponseEntity.created(URI.create("/concerts" + concertId)).body(concertId);
@@ -62,5 +62,10 @@ public class ConcertController {
   public ResponseEntity<ConcertDetailResponse> getConcertDetail(@PathVariable Long concertId) {
     ConcertDetailResponse response = concertService.getConcertDetail(concertId);
     return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/popular")
+  public ResponseEntity<List<ConcertSimpleResponse>> getPopularConcerts() {
+    return ResponseEntity.ok(concertService.getPopularConcerts());
   }
 }
