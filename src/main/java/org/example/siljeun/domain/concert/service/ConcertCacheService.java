@@ -1,6 +1,5 @@
 package org.example.siljeun.domain.concert.service;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -17,16 +16,8 @@ public class ConcertCacheService {
 
   private static final String RANK_KEY = "concert:ranking";
 
-  public void increaseDailyViewCount(Long concertId) {
-    String key = "ranking:daily";
-    redisTemplate.opsForZSet().incrementScore(key, concertId, 1);
-    redisTemplate.expire(key, Duration.ofDays(1));
-  }
-
-  public void increaseWeeklyViewCount(Long concertId) {
-    String key = "ranking:weekly";
-    redisTemplate.opsForZSet().incrementScore(key, concertId, 1);
-    redisTemplate.expire(key, Duration.ofDays(7));
+  public void increaseViewCount(Long concertId) {
+    redisTemplate.opsForZSet().incrementScore(RANK_KEY, concertId, 1);
   }
 
   public List<Long> getTopConcertIds(int limit) {
