@@ -57,16 +57,4 @@ public class RedisConfig {
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer()); // JSON 직렬화
         return template;
     }
-
-    /**
-     * String 타입 RedisTemplate
-     */
-    @Bean
-    public RedisTemplate<String, String> redisStringTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(connectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-        return redisTemplate;
-    }
 }

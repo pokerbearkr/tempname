@@ -1,6 +1,7 @@
 package org.example.siljeun.domain.schedule.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
@@ -18,29 +19,18 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class SeatScheduleInfoService {
     private final SeatScheduleInfoRepository seatScheduleInfoRepository;
     private final ScheduleRepository scheduleRepository;
-    private final RedisTemplate<String, Long> redisSeatUserTemplate;
-    private final RedisTemplate<String, String> redisStatusTemplate;
-
-    public SeatScheduleInfoService(
-            SeatScheduleInfoRepository seatScheduleInfoRepository,
-            ScheduleRepository scheduleRepository,
-            @Qualifier("redisLongTemplate") RedisTemplate<String, Long> redisSeatUserTemplate,
-            @Qualifier("redisStringTemplate") RedisTemplate<String, String> redisStatusTemplate
-    ){
-        this.seatScheduleInfoRepository = seatScheduleInfoRepository;
-        this.scheduleRepository = scheduleRepository;
-        this.redisSeatUserTemplate = redisSeatUserTemplate;
-        this.redisStatusTemplate = redisStatusTemplate;
-    }
+    private final RedisTemplate<String, String> redisTemplate;
 
     @DistributedLock(key = "'seat:' + #seatScheduleInfoId")
-    public void selectSeat(Long userId, Long seatScheduleInfoId) {
+    public void selectSeat(Long userId, Long scheduleId, Long seatScheduleInfoId) {
 
         SeatScheduleInfo seatScheduleInfo = seatScheduleInfoRepository.findById(seatScheduleInfoId).
                 orElseThrow(() -> new EntityNotFoundException("해당 회차별 좌석 정보가 존재하지 않습니다."));
@@ -53,11 +43,23 @@ public class SeatScheduleInfoService {
         seatScheduleInfo.updateSeatScheduleInfoStatus(SeatStatus.SELECTED);
         seatScheduleInfoRepository.save(seatScheduleInfo);
 
-        String redisKey = "seat:" + seatScheduleInfoId;
-        redisSeatUserTemplate.opsForValue().set(redisKey, userId, Duration.ofMinutes(5));
+        // userId와 schedule Id가 key이고 seatSchduleInfoId로 구성된 Set이 value인 형태로 저장
+        String redisSelectedKey = "user:scheduleSelected" + userId + ":" + scheduleId;
+        redisTemplate.opsForSet().add(redisSelectedKey, seatScheduleInfoId.toString());
+        //key에 해당하는 set 데이터를 TTL 5분으로 업데이트
+        redisTemplate.expire(redisSelectedKey, Duration.ofMinutes(5));
 
-        String redisStatusKey = "seatStatus:" + seatScheduleInfoId;
-        redisStatusTemplate.opsForValue().set(redisStatusKey, seatScheduleInfo.getStatus().name(), Duration.ofMinutes(5));
+        //seatScheduleInfoId의 seatStatus 상태 변경
+        redisTemplate.opsForValue().set("seatStatus:"+seatScheduleInfoId.toString(), SeatStatus.SELECTED.name());
+
+        //user가 선점한 좌석들 TTL 5분으로 재설정
+        Set<String> seatScheduleInfoIds = redisTemplate.opsForSet().members(redisSelectedKey);
+        if (seatScheduleInfoIds != null) {
+            for (String seatId : seatScheduleInfoIds) {
+                String redisStatusKey = "seatStatus:" + seatId;
+                redisTemplate.expire(redisStatusKey, Duration.ofMinutes(5)); // TTL 재설정
+            }
+        }
     }
 
     public Map<String, String> getSeatStatusMap(Long scheduleId) {
@@ -72,7 +74,7 @@ public class SeatScheduleInfoService {
 
         for (SeatScheduleInfo info : seatScheduleInfos) {
             String redisKey = "seatStatus:" + info.getId();
-            String redisStatus = redisStatusTemplate.opsForValue().get(redisKey);
+            String redisStatus = redisTemplate.opsForValue().get(redisKey);
 
             String status;
             if (redisStatus != null) {

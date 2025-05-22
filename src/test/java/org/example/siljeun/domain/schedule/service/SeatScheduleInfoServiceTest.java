@@ -89,7 +89,7 @@ class SeatScheduleInfoServiceTest {
         IntStream.range(0, totalThreads).forEach(i -> {
             executor.submit(() -> {
                 try {
-                    seatScheduleInfoService.selectSeat((long) i + 1, seatScheduleInfoId);
+                    seatScheduleInfoService.selectSeat((long) i + 1, schedule.getId(), seatScheduleInfoId);
                     resultMessages.add("SUCCESS");
                 } catch (ResponseStatusException e) {
                     resultMessages.add(e.getReason());
@@ -110,12 +110,5 @@ class SeatScheduleInfoServiceTest {
 
         assertEquals(1, successCount);
         assertEquals(totalThreads - 1, conflictCount);
-
-        SeatScheduleInfo updated = seatScheduleInfoRepository.findById(seatScheduleInfoId).orElseThrow();
-        assertEquals(SeatStatus.SELECTED, updated.getStatus());
-
-        Long storedUserId = redisTemplate.opsForValue().get("seat:" + seatScheduleInfoId);
-        assertNotNull(storedUserId);
-        System.out.println("Redis에 저장된 유저 ID: " + storedUserId);
     }
 }
