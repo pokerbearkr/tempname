@@ -38,4 +38,10 @@ public class ConcertCacheService {
         .toList();
   }
 
+  public List<Long> getTopConcertIds(String key, int limit) {
+    Set<Object> ids = redisTemplate.opsForZSet()
+        .reverseRange(key, 0, limit - 1);
+    return ids.stream().map(id -> Long.valueOf(id.toString())).toList();
+  }
+
 }
