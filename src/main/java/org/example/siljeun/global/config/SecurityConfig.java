@@ -1,7 +1,7 @@
 package org.example.siljeun.global.config;
 
 import lombok.RequiredArgsConstructor;
-import org.example.siljeun.domain.user.service.CustomUserDetailsService;
+import org.example.siljeun.domain.user.service.PrincipalDetailsService;
 import org.example.siljeun.global.security.CustomOAuth2SuccessHandler;
 import org.example.siljeun.global.security.JwtAuthenticationFilter;
 import org.example.siljeun.global.security.JwtUtil;
@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
 @Configuration
 @EnableWebSecurity
@@ -21,14 +22,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
   private final JwtUtil jwtUtil;
-  private final CustomUserDetailsService userDetailsService;
+  private final PrincipalDetailsService userDetailsService;
   private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .csrf(csrf -> csrf.disable())
-        .formLogin(form -> form.disable())
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
@@ -47,7 +47,13 @@ public class SecurityConfig {
   }
 
   @Bean
+  public JwtAuthenticationFilter jwtAuthenticationFilter() {
+    return new JwtAuthenticationFilter(jwtUtil, userDetailsService);
+  }
+
+  @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
+
 }

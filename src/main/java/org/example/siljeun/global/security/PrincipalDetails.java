@@ -9,7 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails {
+public class PrincipalDetails implements UserDetails {
 
   private final User user;
 
@@ -19,7 +19,7 @@ public class CustomUserDetails implements UserDetails {
 
   @Override
   public String getUsername() {
-    return "";
+    return user.getUsername();
   }
 
   @Override

@@ -34,7 +34,7 @@ public class KakaoOAuthService {
 
   private User registerUser(KakaoUserInfo userInfo) {
     User user = new User(userInfo.getEmail(), userInfo.getNickname(), Provider.KAKAO,
-        userInfo.getId());
+        userInfo.getProviderId());
     return userRepository.save(user);
   }
 
