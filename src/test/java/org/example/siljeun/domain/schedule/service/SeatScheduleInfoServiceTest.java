@@ -7,7 +7,7 @@ import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
 import org.example.siljeun.domain.seatscheduleinfo.repository.SeatScheduleInfoRepository;
 import org.example.siljeun.domain.seat.entity.Seat;
-import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
+import org.example.siljeun.domain.seatscheduleinfo.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.seat.enums.SeatStatus;
 import org.example.siljeun.domain.seatscheduleinfo.service.SeatScheduleInfoService;
 import org.example.siljeun.domain.venue.entity.Venue;

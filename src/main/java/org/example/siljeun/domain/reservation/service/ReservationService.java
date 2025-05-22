@@ -9,7 +9,7 @@ import org.example.siljeun.domain.reservation.exception.CustomException;
 import org.example.siljeun.domain.reservation.exception.ErrorCode;
 import org.example.siljeun.domain.reservation.repository.ReservationRepository;
 import org.example.siljeun.domain.seatscheduleinfo.repository.SeatScheduleInfoRepository;
-import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
+import org.example.siljeun.domain.seatscheduleinfo.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.seat.enums.SeatStatus;
 import org.example.siljeun.domain.user.entity.User;
 import org.example.siljeun.domain.user.repository.UserRepository;

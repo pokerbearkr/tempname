@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import org.example.siljeun.domain.reservation.dto.request.UpdatePriceRequest;
 import org.example.siljeun.domain.reservation.enums.Discount;
 import org.example.siljeun.domain.reservation.enums.TicketReceipt;
-import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
+import org.example.siljeun.domain.seatscheduleinfo.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.user.entity.User;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
