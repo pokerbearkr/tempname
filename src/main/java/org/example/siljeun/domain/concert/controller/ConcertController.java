@@ -64,8 +64,13 @@ public class ConcertController {
     return ResponseEntity.ok(response);
   }
 
-  @GetMapping("/popular")
-  public ResponseEntity<List<ConcertSimpleResponse>> getPopularConcerts() {
-    return ResponseEntity.ok(concertService.getPopularConcerts());
+  @GetMapping("/popular/daily")
+  public ResponseEntity<List<ConcertSimpleResponse>> getDailyPopularConcerts() {
+    return ResponseEntity.ok(concertService.getDailyPopularConcerts());
+  }
+
+  @GetMapping("/popular/weekly")
+  public ResponseEntity<List<ConcertSimpleResponse>> getWeeklyPopularConcerts() {
+    return ResponseEntity.ok(concertService.getWeeklyPopularConcerts());
   }
 }
