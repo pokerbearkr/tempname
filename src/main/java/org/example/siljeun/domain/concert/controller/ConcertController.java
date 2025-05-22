@@ -63,4 +63,9 @@ public class ConcertController {
     ConcertDetailResponse response = concertService.getConcertDetail(concertId);
     return ResponseEntity.ok(response);
   }
+
+  @GetMapping("/popular")
+  public ResponseEntity<List<ConcertSimpleResponse>> getPopularConcerts() {
+    return ResponseEntity.ok(concertService.getPopularConcerts());
+  }
 }

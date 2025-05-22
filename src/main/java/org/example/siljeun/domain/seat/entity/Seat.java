@@ -1,38 +1,51 @@
 package org.example.siljeun.domain.seat.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.siljeun.domain.seat.dto.request.SeatCreateRequest;
 import org.example.siljeun.domain.venue.entity.Venue;
 
 @Entity
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "seat")
+@Table(
+    name = "seat",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"venue_id", "section", "seat_row", "seat_column"}) //O공연장의 O구역 O열 O좌석은 고유하다
+    }
+)
 public class Seat {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  //공연장 FK
-  @ManyToOne
-  @JoinColumn(name = "venue_id")
-  private Venue venue;
+    //공연장 FK
+    @ManyToOne
+    @JoinColumn(name = "venue_id")
+    private Venue venue;
 
-  private String section;
+    private String section;
+    @Column(name = "seat_row")
+    private String row;
+    @Column(name = "seat_column")
+    private String column;
+    private String defaultGrade;
+    private int defaultPrice;
 
-  @Column(name = "`row`")
-  private String row;
-  private String number;
+    public Seat(Venue venue, String section, String row, String column, String defaultGrade, int defaultPrice) {
+        this.venue = venue;
+        this.section = section;
+        this.row = row;
+        this.column = column;
+        this.defaultGrade = defaultGrade;
+        this.defaultPrice = defaultPrice;
+    }
 
+    public static Seat from(Venue venue, SeatCreateRequest request) {
+        return new Seat(venue, request.section(), request.row(), request.column(), request.defaultGrade(), request.defaultPrice());
+    }
 }
