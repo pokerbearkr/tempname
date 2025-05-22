@@ -33,7 +33,7 @@ public record ReservationInfoResponse(
         reservation.getSeatScheduleInfo().getGrade(),
         reservation.getSeatScheduleInfo().getSeat().getSection(),
         reservation.getSeatScheduleInfo().getSeat().getRow(),
-        reservation.getSeatScheduleInfo().getSeat().getNumber(),
+        reservation.getSeatScheduleInfo().getSeat().getColumn(),
         reservation.getTicketReceipt(),
         reservation.getPrice(),
         reservation.getDiscount(),
