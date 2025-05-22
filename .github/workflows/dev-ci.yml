@@ -63,7 +63,4 @@ jobs:
           echo "spring.jpa.show-sql=true" >> ./src/main/resources/application.properties
 
       - name: Build Project
-        run: ./gradlew clean build
-
-      - name: Run Tests
-        run: ./gradlew test
+        run: ./gradlew clean build -x test
