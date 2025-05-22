@@ -120,21 +120,26 @@ public class ConcertServiceImpl implements ConcertService {
   }
 
   @Override
-  public List<ConcertSimpleResponse> getPopularConcerts() {
-    List<Long> topIds = concertCacheService.getTopConcertIds(7);
-    List<Concert> concerts = concertRepository.findByIdIn(topIds);
+  public List<ConcertSimpleResponse> getDailyPopularConcerts() {
+    List<Long> ids = concertCacheService.getTopConcertIds("ranking:daily", 7);
+    return mapConcertsByIdOrder(ids);
+  }
 
+  @Override
+  public List<ConcertSimpleResponse> getWeeklyPopularConcerts() {
+    List<Long> ids = concertCacheService.getTopConcertIds("ranking:weekly", 7);
+    return mapConcertsByIdOrder(ids);
+  }
+
+  private List<ConcertSimpleResponse> mapConcertsByIdOrder(List<Long> ids) {
+    List<Concert> concerts = concertRepository.findByIdIn(ids);
     Map<Long, Concert> concertMap = concerts.stream()
         .collect(Collectors.toMap(Concert::getId, c -> c));
-
-    return topIds.stream()
+    return ids.stream()
         .map(concertMap::get)
         .filter(Objects::nonNull)
         .map(c -> new ConcertSimpleResponse(
-            c.getId(),
-            c.getTitle(),
-            c.getVenue().getName(),
-            c.getCategory().name()
+            c.getId(), c.getTitle(), c.getVenue().getName(), c.getCategory().name()
         ))
         .toList();
   }
