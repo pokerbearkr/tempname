@@ -1,11 +1,14 @@
 package org.example.siljeun.domain.reservation.service;
 
 import jakarta.annotation.PostConstruct;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.siljeun.domain.reservation.dto.response.MyQueueInfoResponse;
 import org.example.siljeun.domain.reservation.exception.CustomException;
 import org.example.siljeun.domain.reservation.exception.ErrorCode;
+import org.example.siljeun.domain.schedule.entity.Schedule;
+import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -22,6 +25,7 @@ public class WaitingQueueService {
   private static final long ttlMillis = 900000L; // ttl 15분
   private static final long acceptedRank = 1000L; // 좌석 선택 최대 수용 인원 1000명
   private static final String prefixKey = "queue:schedule:";
+  private final ScheduleRepository scheduleRepository;
 
   // redis 연결 확인
   @PostConstruct
@@ -32,6 +36,13 @@ public class WaitingQueueService {
 
   // 예매 대기 시작
   public void addQueue(Long scheduleId, String username) {
+
+    Schedule schedule = scheduleRepository.findById(scheduleId)
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_SCHEDULE));
+
+    if (LocalDateTime.now().isBefore(schedule.getTicketingStartTime())) {
+      throw new CustomException(ErrorCode.NOT_TICKETING_TIME);
+    }
 
     String key = prefixKey + scheduleId;
     long expiredAt = System.currentTimeMillis() + ttlMillis;
