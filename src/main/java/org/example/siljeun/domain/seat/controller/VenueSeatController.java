@@ -1,9 +1,9 @@
-package org.example.siljeun.domain.venue.controller;
+package org.example.siljeun.domain.seat.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.siljeun.domain.seat.dto.request.SeatCreateRequest;
-import org.example.siljeun.domain.venue.service.VenueSeatService;
+import org.example.siljeun.domain.seat.service.SeatService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/venues")
 public class VenueSeatController {
 
-    private final VenueSeatService venueSeatService;
+    private final SeatService venueSeatService;
 
     //좌석 정보를 CSV 파일 또는 GUI로 다수의 정보를 한번에 등록한다.
     @PostMapping("/{venueId}/seats")

@@ -1,4 +1,4 @@
-package org.example.siljeun.domain.venue.repository;
+package org.example.siljeun.domain.seat.repository;
 
 import org.example.siljeun.domain.seat.entity.Seat;
 import org.example.siljeun.domain.venue.entity.Venue;

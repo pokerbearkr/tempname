@@ -1,4 +1,4 @@
-package org.example.siljeun.domain.seat.dto.request;
+package org.example.siljeun.domain.seatscheduleinfo.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import org.example.siljeun.domain.seat.enums.SeatStatus;

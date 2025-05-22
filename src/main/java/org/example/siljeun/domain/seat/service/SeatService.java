@@ -1,22 +1,21 @@
-package org.example.siljeun.domain.venue.service;
+package org.example.siljeun.domain.seat.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.siljeun.domain.seat.dto.request.SeatCreateRequest;
 import org.example.siljeun.domain.seat.entity.Seat;
 import org.example.siljeun.domain.venue.entity.Venue;
 import org.example.siljeun.domain.venue.repository.VenueRepository;
-import org.example.siljeun.domain.venue.repository.VenueSeatRepository;
+import org.example.siljeun.domain.seat.repository.VenueSeatRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class VenueSeatService {
+public class SeatService {
 
     private final VenueRepository venueRepository;
     private final VenueSeatRepository venueSeatRepository;

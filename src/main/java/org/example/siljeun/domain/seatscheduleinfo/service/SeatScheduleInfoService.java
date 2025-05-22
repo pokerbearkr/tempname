@@ -1,15 +1,14 @@
-package org.example.siljeun.domain.schedule.service;
+package org.example.siljeun.domain.seatscheduleinfo.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
-import org.example.siljeun.domain.schedule.repository.SeatScheduleInfoRepository;
+import org.example.siljeun.domain.seat.repository.SeatScheduleInfoRepository;
 import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.seat.enums.SeatStatus;
 import org.example.siljeun.global.lock.DistributedLock;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

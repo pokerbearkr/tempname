@@ -11,11 +11,11 @@ import org.example.siljeun.domain.schedule.dto.request.ScheduleUpdateRequest;
 import org.example.siljeun.domain.schedule.dto.response.ScheduleSimpleResponse;
 import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
-import org.example.siljeun.domain.schedule.repository.SeatScheduleInfoRepository;
+import org.example.siljeun.domain.seat.repository.SeatScheduleInfoRepository;
 import org.example.siljeun.domain.seat.entity.Seat;
 import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.seat.enums.SeatStatus;
-import org.example.siljeun.domain.venue.repository.VenueSeatRepository;
+import org.example.siljeun.domain.seat.repository.VenueSeatRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,7 +1,7 @@
-package org.example.siljeun.domain.schedule.controller;
+package org.example.siljeun.domain.seatscheduleinfo.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.siljeun.domain.schedule.service.SeatScheduleInfoService;
+import org.example.siljeun.domain.seatscheduleinfo.service.SeatScheduleInfoService;
 import org.example.siljeun.global.security.PrincipalDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

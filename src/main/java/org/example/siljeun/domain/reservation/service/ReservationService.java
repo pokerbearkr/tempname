@@ -8,7 +8,7 @@ import org.example.siljeun.domain.reservation.entity.Reservation;
 import org.example.siljeun.domain.reservation.exception.CustomException;
 import org.example.siljeun.domain.reservation.exception.ErrorCode;
 import org.example.siljeun.domain.reservation.repository.ReservationRepository;
-import org.example.siljeun.domain.schedule.repository.SeatScheduleInfoRepository;
+import org.example.siljeun.domain.seat.repository.SeatScheduleInfoRepository;
 import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.seat.enums.SeatStatus;
 import org.example.siljeun.domain.user.entity.User;
@@ -18,9 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

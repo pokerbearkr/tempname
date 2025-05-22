@@ -1,4 +1,4 @@
-package org.example.siljeun.domain.schedule.repository;
+package org.example.siljeun.domain.seat.repository;
 
 import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
