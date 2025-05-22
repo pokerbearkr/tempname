@@ -1,5 +1,9 @@
 package org.example.siljeun.domain.reservation.entity;
 
+import static org.example.siljeun.domain.reservation.enums.ReservationStatus.COMPLETE;
+import static org.example.siljeun.domain.reservation.enums.ReservationStatus.PENDING;
+
+import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -15,11 +19,13 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.siljeun.domain.reservation.dto.request.UpdatePriceRequest;
 import org.example.siljeun.domain.reservation.enums.Discount;
 import org.example.siljeun.domain.reservation.enums.ReservationStatus;
 import org.example.siljeun.domain.reservation.enums.TicketReceipt;
 import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.user.entity.User;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -28,6 +34,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "reservation")
 @EntityListeners(AuditingEntityListener.class)
+@DynamicUpdate
 public class Reservation {
 
   @Id
@@ -42,6 +49,7 @@ public class Reservation {
   @JoinColumn(name = "seat_schedule_info_id", nullable = false)
   private SeatScheduleInfo seatScheduleInfo;
 
+  @Column(nullable = false)
   private int price;
 
   @Column(nullable = false)
@@ -58,5 +66,28 @@ public class Reservation {
 
   @CreatedDate
   @Column(name = "created_at", nullable = false, updatable = false)
-  private LocalDateTime created_at;
+  private LocalDateTime createdAt;
+
+  public Reservation(User user, SeatScheduleInfo seatScheduleInfo) {
+    this.user = user;
+    this.seatScheduleInfo = seatScheduleInfo;
+    this.price = seatScheduleInfo.getPrice();
+    this.ticketReceipt = TicketReceipt.PICKUP;
+    this.discount = Discount.GENERAL;
+    this.status = PENDING;
+  }
+
+  public void updateReservationStatus(Reservation reservation) {
+    this.status = (reservation.status == PENDING) ?
+        COMPLETE : PENDING;
+  }
+
+  public void updateTicketPrice(UpdatePriceRequest dto) {
+    if (!StringUtils.isBlank(dto.ticketReceipt())) {
+      this.ticketReceipt = TicketReceipt.valueOf(dto.ticketReceipt());
+    }
+    if (!StringUtils.isBlank(dto.discount())) {
+      this.discount = Discount.valueOf(dto.discount());
+    }
+  }
 }
