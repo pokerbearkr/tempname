@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.example.siljeun.domain.user.enums.Provider;
 import org.example.siljeun.domain.user.enums.Role;
 import org.example.siljeun.global.entity.BaseEntity;
@@ -18,6 +19,7 @@ import org.example.siljeun.global.entity.BaseEntity;
 @Getter
 @Entity
 @Table(name = "users")
+@NoArgsConstructor
 public class User extends BaseEntity {
 
   @Id
@@ -50,6 +52,12 @@ public class User extends BaseEntity {
   private Long providerId;
 
   private LocalDateTime deletedAt;
+
+  public User(String email, String username, String password) {
+    this.email = email;
+    this.username = username;
+    this.password = password;
+  }
 
   public User(String email, String nickname, Provider provider, Long providerId) {
     this.email = email;
