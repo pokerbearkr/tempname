@@ -84,6 +84,7 @@ public class WaitingQueueService {
   }
 
   // sorted set에 해당 scheduleId, userId를 가지는 데이터가 존재하는지 확인
+  // Todo : 좌석 선택 메서드 안에서 호출(정상 경로로 접근했는지 검증 필요)
   public boolean checkQueue(Long scheduleId, String username) {
     boolean exists = redisTemplate.opsForZSet().score(prefixKey + scheduleId, username) != null;
     return exists;
