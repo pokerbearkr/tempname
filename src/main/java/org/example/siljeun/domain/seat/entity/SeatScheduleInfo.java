@@ -39,7 +39,7 @@ public class SeatScheduleInfo extends BaseEntity {
     private String grade;
     private int price;
 
-    private SeatScheduleInfo(Seat seat, Schedule schedule, SeatStatus status, String grade, int price) {
+    public SeatScheduleInfo(Seat seat, Schedule schedule, SeatStatus status, String grade, int price) {
         this.seat = seat;
         this.schedule = schedule;
         this.status = status;

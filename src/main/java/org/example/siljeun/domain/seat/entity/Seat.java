@@ -36,7 +36,7 @@ public class Seat {
     private String defaultGrade;
     private int defaultPrice;
 
-    private Seat(Venue venue, String section, String row, String column, String defaultGrade, int defaultPrice) {
+    public Seat(Venue venue, String section, String row, String column, String defaultGrade, int defaultPrice) {
         this.venue = venue;
         this.section = section;
         this.row = row;

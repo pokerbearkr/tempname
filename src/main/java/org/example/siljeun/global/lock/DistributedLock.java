@@ -20,7 +20,7 @@ public @interface DistributedLock {
     long waitTime() default 5L;
 
     /**
-     * 락 임대 시간 (default - 3s)
+     * 락 임대 시간 (default - 10s)
      * 락을 획득한 이후 leaseTime 이 지나면 락을 해제한다
      */
     long leaseTime() default 10L;

@@ -9,7 +9,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import java.lang.reflect.Method;
 
@@ -23,11 +22,10 @@ public class DistributedLockAop {
     private final RedissonClient redissonClient;
     private final AopForTransaction aopForTransaction;
 
-    @Around("@annotation(DistributedLock)")
-    public Object lock(final ProceedingJoinPoint joinPoint) throws Throwable {
+    @Around("@annotation(distributedLock)")
+    public Object lock(final ProceedingJoinPoint joinPoint, DistributedLock distributedLock) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
-        DistributedLock distributedLock = method.getAnnotation(DistributedLock.class);
 
         String key = REDISSON_LOCK_PREFIX +
                 CustomSpringELParser.getDynamicValue(
@@ -35,7 +33,7 @@ public class DistributedLockAop {
                         joinPoint.getArgs(),
                         distributedLock.key());
 
-        log.info("lock on [method:{}] [key:{}]", method, key);
+        log.info("lock on [key:{}]", key);
 
         RLock rLock = redissonClient.getLock(key);
 
@@ -49,6 +47,7 @@ public class DistributedLockAop {
             }
 
             return aopForTransaction.proceed(joinPoint);
+
         } catch (InterruptedException e) {
             throw new InterruptedException();
         } finally {
