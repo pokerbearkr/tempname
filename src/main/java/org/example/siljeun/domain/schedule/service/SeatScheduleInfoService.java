@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -43,23 +40,15 @@ public class SeatScheduleInfoService {
         seatScheduleInfo.updateSeatScheduleInfoStatus(SeatStatus.SELECTED);
         seatScheduleInfoRepository.save(seatScheduleInfo);
 
-        // userId와 schedule Id가 key이고 seatSchduleInfoId로 구성된 Set이 value인 형태로 저장
+        //userId와 schedule Id가 key이고 seatSchduleInfoId로 구성된 Set이 value인 형태로 저장
         String redisSelectedKey = "user:scheduleSelected" + userId + ":" + scheduleId;
         redisTemplate.opsForSet().add(redisSelectedKey, seatScheduleInfoId.toString());
         //key에 해당하는 set 데이터를 TTL 5분으로 업데이트
         redisTemplate.expire(redisSelectedKey, Duration.ofMinutes(5));
 
         //seatScheduleInfoId의 seatStatus 상태 변경
-        redisTemplate.opsForValue().set("seatStatus:"+seatScheduleInfoId.toString(), SeatStatus.SELECTED.name());
-
-        //user가 선점한 좌석들 TTL 5분으로 재설정
-        Set<String> seatScheduleInfoIds = redisTemplate.opsForSet().members(redisSelectedKey);
-        if (seatScheduleInfoIds != null) {
-            for (String seatId : seatScheduleInfoIds) {
-                String redisStatusKey = "seatStatus:" + seatId;
-                redisTemplate.expire(redisStatusKey, Duration.ofMinutes(5)); // TTL 재설정
-            }
-        }
+        String redisHashKey = "schedule:seatStatus:" + scheduleId;
+        redisTemplate.opsForHash().put(redisHashKey + scheduleId, seatScheduleInfoId.toString(), SeatStatus.SELECTED.name());
     }
 
     public Map<String, String> getSeatStatusMap(Long scheduleId) {
@@ -70,24 +59,26 @@ public class SeatScheduleInfoService {
         List<SeatScheduleInfo> seatScheduleInfos =
                 seatScheduleInfoRepository.findAllBySchedule(schedule);
 
-        Map<String, String> result = new HashMap<>();
+        List<String> fieldKeys = seatScheduleInfos.stream()
+                .map(info -> info.getId().toString())
+                .toList();
 
-        for (SeatScheduleInfo info : seatScheduleInfos) {
-            String redisKey = "seatStatus:" + info.getId();
-            String redisStatus = redisTemplate.opsForValue().get(redisKey);
+        String redisHashKey = "seatStatus:" + scheduleId;
+        List<Object> redisStatuses = redisTemplate.opsForHash().multiGet(redisHashKey, new ArrayList<>(fieldKeys));
 
-            String status;
-            if (redisStatus != null) {
-                status = redisStatus;
-            } else if (info.getStatus() == SeatStatus.SELECTED) { //TTL에 의해서 Redis에서는 만료되었으나 DB에 Selected로 저장된 경우
-                status = SeatStatus.AVAILABLE.name();
-            } else {
-                status = info.getStatus().name();
-            }
+        Map<String, String> seatStatusMap = new HashMap<>();
 
-            result.put("seatScheduleInfo-" + info.getId().toString(), status);
+        for (int i = 0; i < seatScheduleInfos.size(); i++) {
+            SeatScheduleInfo info = seatScheduleInfos.get(i);
+            Object redisStatusObj = redisStatuses.get(i);
+
+            String status = redisStatusObj != null
+                    ? redisStatusObj.toString()
+                    : seatScheduleInfos.get(i).getStatus().name();
+
+            seatStatusMap.put("seatScheduleInfo-" + info.getId().toString(), status);
         }
 
-        return result;
+        return seatStatusMap;
     }
 }

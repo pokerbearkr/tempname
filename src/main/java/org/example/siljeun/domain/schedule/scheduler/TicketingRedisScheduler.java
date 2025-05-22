@@ -11,7 +11,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -31,11 +33,14 @@ public class TicketingRedisScheduler {
         for (Schedule schedule : openedSchedules) {
             List<SeatScheduleInfo> seatScheduleInfos = seatScheduleInfoRepository.findAllBySchedule(schedule);
 
-            for(SeatScheduleInfo seatScheduleInfo : seatScheduleInfos){
-                String key = "seatStatus:" +  seatScheduleInfo.getId().toString();
-                String value = seatScheduleInfo.getStatus().name();
-                redisTemplate.opsForValue().set(key, value);
+            String key = "seatStatus:" +  schedule.getId();
+            Map<String, String> seatStatusMap = new HashMap<>();
+
+            for (SeatScheduleInfo seat : seatScheduleInfos) {
+                seatStatusMap.put(seat.getId().toString(), seat.getStatus().name());
             }
+
+            redisTemplate.opsForHash().putAll(key, seatStatusMap);
         }
     }
 }
