@@ -1,7 +1,7 @@
 package org.example.siljeun.global.config;
 
 import lombok.RequiredArgsConstructor;
-import org.example.siljeun.domain.user.service.CustomUserDetailsService;
+import org.example.siljeun.domain.user.service.PrincipalDetailsService;
 import org.example.siljeun.global.security.CustomOAuth2SuccessHandler;
 import org.example.siljeun.global.security.JwtAuthenticationFilter;
 import org.example.siljeun.global.security.JwtUtil;
@@ -13,39 +13,44 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
+@Component
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
   private final JwtUtil jwtUtil;
-  private final CustomUserDetailsService userDetailsService;
+  private final PrincipalDetailsService userDetailsService;
   private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .csrf(csrf -> csrf.disable())
-        .formLogin(form -> form.disable())
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/**", "/oauth2/**", "/login/**").permitAll()
+            .requestMatchers("/auth/**", "/oauth2/**", "/oauth/**").permitAll()
             .anyRequest().authenticated()
         )
         .oauth2Login(oauth2 -> oauth2
             .successHandler(customOAuth2SuccessHandler)
-            .defaultSuccessUrl("/auth/oauth2/success", true)
             .failureUrl("/auth/oauth2/failure")
         )
-        .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userDetailsService),
-            UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
+  }
+
+  @Bean
+  public JwtAuthenticationFilter jwtAuthenticationFilter() {
+    return new JwtAuthenticationFilter(jwtUtil, userDetailsService);
   }
 
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
+
 }

@@ -22,7 +22,8 @@ public class AuthService {
     // 비밀번호 암호화
     String password = passwordEncoder.encode(request.password());
 
-    User user = new User(request.email(), request.username(), password);
+    User user = new User(request.email(), request.username(), password, request.nickname(),
+        request.role(), request.provider());
     User savedUser = userRepository.save(user);
 
     return new SignUpResponse(savedUser.getId(), savedUser.getEmail(), savedUser.getUsername());

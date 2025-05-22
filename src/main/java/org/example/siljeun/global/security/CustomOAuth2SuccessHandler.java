@@ -1,6 +1,7 @@
 package org.example.siljeun.global.security;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,20 +21,25 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
-    // 1. principal에서 사용자 정보 추출
+    // principal에서 사용자 정보 추출
     OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
     String username = "kakao_" + oAuth2User.getAttribute("id").toString();
 
-    // 2. JWT 생성
+    // JWT 생성
     String token = jwtUtil.createToken(username);
 
-    // 3. JSON 응답 세팅
-    response.setStatus(HttpServletResponse.SC_OK);
-    response.setContentType("application/json;charset=UTF-8");
+    // JWT를 HttpOnly 쿠키로 설정
+    Cookie cookie = new Cookie("token", token);
+    cookie.setHttpOnly(true);
+    cookie.setSecure(false); // 개발 환경에서는 false, HTTPS 환경에서는 true
+    cookie.setPath("/");
+    cookie.setMaxAge(60 * 60); // 1시간
 
-    // 4. JWT를 JSON 응답 바디로 내려주기
-    String json = String.format("{\"token\":\"%s\"}", token);
-    response.getWriter().write(json);
+    response.addCookie(cookie);
+
+    // 응답 상태만 OK로 설정
+    response.setStatus(HttpServletResponse.SC_OK);
+    response.getWriter().write("{\"message\": \"Login successful\"}");
     response.getWriter().flush();
   }
 
