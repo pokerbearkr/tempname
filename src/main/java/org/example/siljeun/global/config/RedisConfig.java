@@ -8,35 +8,53 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfig {
-    @Value("${spring.data.redis.host}")
-    private String host;
-    @Value("${spring.data.redis.port}")
-    private int port;
 
-    private static final String REDISSON_PREFIX = "redis://";
+  @Value("${spring.data.redis.host}")
+  private String host;
 
-    //for redisson
-    @Bean
-    public RedissonClient redissonClient() {
-        Config config = new Config();
-        config.useSingleServer()
-                .setAddress(REDISSON_PREFIX + host + ":" + port);
-                //.setPassword(null); //현재 비밀번호가 별도로 설정되어있지 않기 때문에 null
-        return Redisson.create(config);
-    }
+  @Value("${spring.data.redis.port}")
+  private int port;
 
-    //for redis
-    @Bean
-    public RedisTemplate<String, Long> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Long> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(connectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericToStringSerializer<>(Long.class)); // Long 값 직렬화
-        return redisTemplate;
-    }
+  private static final String REDISSON_PREFIX = "redis://";
+
+  /**
+   * Redisson 클라이언트 설정
+   */
+  @Bean
+  public RedissonClient redissonClient() {
+    Config config = new Config();
+    config.useSingleServer()
+        .setAddress(REDISSON_PREFIX + host + ":" + port);
+    return Redisson.create(config);
+  }
+
+  /**
+   * Long 타입 RedisTemplate (조회수 등 숫자 기반 저장용)
+   */
+  @Bean
+  public RedisTemplate<String, Long> redisLongTemplate(RedisConnectionFactory connectionFactory) {
+    RedisTemplate<String, Long> redisTemplate = new RedisTemplate<>();
+    redisTemplate.setConnectionFactory(connectionFactory);
+    redisTemplate.setKeySerializer(new StringRedisSerializer());
+    redisTemplate.setValueSerializer(new GenericToStringSerializer<>(Long.class));
+    return redisTemplate;
+  }
+
+  /**
+   * JSON 직렬화 RedisTemplate (객체 캐싱용)
+   */
+  @Bean
+  public RedisTemplate<String, Object> redisJsonTemplate(RedisConnectionFactory connectionFactory) {
+    RedisTemplate<String, Object> template = new RedisTemplate<>();
+    template.setConnectionFactory(connectionFactory);
+    template.setKeySerializer(new StringRedisSerializer());
+    template.setValueSerializer(new GenericJackson2JsonRedisSerializer()); // JSON 직렬화
+    return template;
+  }
 }
