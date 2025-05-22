@@ -29,14 +29,14 @@ public class KakaoApiClient {
 
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     params.add("grant_type", "authorization_code");
-    params.add("client_id", properties.getClientId());
-    params.add("redirect_uri", properties.getRedirectUri());
+    params.add("client_id", "eaee0e144aeb9afef54d5c449448baea");
+    params.add("redirect_uri", "http://localhost:8080/oauth/kakao/callback");
     params.add("code", code);
 
     HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
     ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-        properties.getTokenUri(),
+        "https://kauth.kakao.com/oauth/token",
         HttpMethod.POST,
         request,
         new ParameterizedTypeReference<>() {
@@ -57,7 +57,7 @@ public class KakaoApiClient {
     HttpEntity<Void> request = new HttpEntity<>(headers);
 
     ResponseEntity<KakaoUserInfo> response = restTemplate.exchange(
-        properties.getUserInfoUri(),
+        "https://kapi.kakao.com/v2/user/me",
         HttpMethod.GET,
         request,
         KakaoUserInfo.class
