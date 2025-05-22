@@ -16,9 +16,9 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/venues")
-public class VenueSeatController {
+public class SeatController {
 
-    private final SeatService venueSeatService;
+    private final SeatService seatService;
 
     //좌석 정보를 CSV 파일 또는 GUI로 다수의 정보를 한번에 등록한다.
     @PostMapping("/{venueId}/seats")
@@ -26,7 +26,7 @@ public class VenueSeatController {
             @PathVariable Long venueId,
             @RequestBody @Valid List<SeatCreateRequest> seatCreateRequests
     ){
-        venueSeatService.createSeats(venueId, seatCreateRequests);
+        seatService.createSeats(venueId, seatCreateRequests);
         return ResponseEntity.ok().build();
     }
 }

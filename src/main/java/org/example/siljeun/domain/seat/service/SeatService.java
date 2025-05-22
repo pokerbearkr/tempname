@@ -5,7 +5,7 @@ import org.example.siljeun.domain.seat.dto.request.SeatCreateRequest;
 import org.example.siljeun.domain.seat.entity.Seat;
 import org.example.siljeun.domain.venue.entity.Venue;
 import org.example.siljeun.domain.venue.repository.VenueRepository;
-import org.example.siljeun.domain.seat.repository.VenueSeatRepository;
+import org.example.siljeun.domain.seat.repository.SeatRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,7 @@ import java.util.List;
 public class SeatService {
 
     private final VenueRepository venueRepository;
-    private final VenueSeatRepository venueSeatRepository;
+    private final SeatRepository seatRepository;
 
     @Transactional
     public void createSeats(Long venueId, List<SeatCreateRequest> seatCreateRequests){
@@ -31,6 +31,6 @@ public class SeatService {
                 .map(request -> Seat.from(venue, request))
                 .toList();
 
-        venueSeatRepository.saveAll(seats);
+        seatRepository.saveAll(seats);
     }
 }

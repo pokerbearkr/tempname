@@ -5,14 +5,14 @@ import org.example.siljeun.domain.concert.entity.ConcertCategory;
 import org.example.siljeun.domain.concert.repository.ConcertRepository;
 import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
-import org.example.siljeun.domain.seat.repository.SeatScheduleInfoRepository;
+import org.example.siljeun.domain.seatscheduleinfo.repository.SeatScheduleInfoRepository;
 import org.example.siljeun.domain.seat.entity.Seat;
 import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.seat.enums.SeatStatus;
 import org.example.siljeun.domain.seatscheduleinfo.service.SeatScheduleInfoService;
 import org.example.siljeun.domain.venue.entity.Venue;
 import org.example.siljeun.domain.venue.repository.VenueRepository;
-import org.example.siljeun.domain.seat.repository.VenueSeatRepository;
+import org.example.siljeun.domain.seat.repository.SeatRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,7 @@ class SeatScheduleInfoServiceTest {
     private VenueRepository venueRepository;
 
     @Autowired
-    private VenueSeatRepository venueSeatRepository;
+    private SeatRepository seatRepository;
 
     @Autowired
     private ScheduleRepository scheduleRepository;
@@ -69,7 +69,7 @@ class SeatScheduleInfoServiceTest {
     void setUp() {
         redisTemplate.getConnectionFactory().getConnection().flushAll();
         Venue venue = venueRepository.save(new Venue("샤롯데씨어터", "잠실 어딘가", 1));
-        seat = venueSeatRepository.save(new Seat(venue, "A", "1", "1", "VIP", 180000));
+        seat = seatRepository.save(new Seat(venue, "A", "1", "1", "VIP", 180000));
         Concert concert = concertRepository.save(new Concert("위키드", "엘파바와 글린다", ConcertCategory.MUSICAL, venue, 1000));
         schedule = scheduleRepository.save(new Schedule(concert, LocalDateTime.of(2025, 6, 6, 14, 30), LocalDateTime.of(2025, 5, 6, 10, 0)));
     }

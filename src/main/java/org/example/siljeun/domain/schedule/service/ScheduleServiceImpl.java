@@ -11,11 +11,11 @@ import org.example.siljeun.domain.schedule.dto.request.ScheduleUpdateRequest;
 import org.example.siljeun.domain.schedule.dto.response.ScheduleSimpleResponse;
 import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
-import org.example.siljeun.domain.seat.repository.SeatScheduleInfoRepository;
+import org.example.siljeun.domain.seatscheduleinfo.repository.SeatScheduleInfoRepository;
 import org.example.siljeun.domain.seat.entity.Seat;
 import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.seat.enums.SeatStatus;
-import org.example.siljeun.domain.seat.repository.VenueSeatRepository;
+import org.example.siljeun.domain.seat.repository.SeatRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +26,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final ConcertRepository concertRepository;
-    private final VenueSeatRepository venueSeatRepository;
+    private final SeatRepository seatRepository;
     private final SeatScheduleInfoRepository seatScheduleInfoRepository;
 
     @Override
@@ -44,7 +44,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         Schedule saved = scheduleRepository.save(schedule);
 
         //회차 생성 시, 회차별 좌석 정보도 함께 생성
-        List<Seat> seats = venueSeatRepository.findByVenue(concert.getVenue());
+        List<Seat> seats = seatRepository.findByVenue(concert.getVenue());
 
         List<SeatScheduleInfo> seatInfos = seats.stream()
                 .map(seat -> SeatScheduleInfo.from(

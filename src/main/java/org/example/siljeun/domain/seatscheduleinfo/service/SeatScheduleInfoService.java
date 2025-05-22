@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
-import org.example.siljeun.domain.seat.repository.SeatScheduleInfoRepository;
+import org.example.siljeun.domain.seatscheduleinfo.repository.SeatScheduleInfoRepository;
 import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.seat.enums.SeatStatus;
 import org.example.siljeun.global.lock.DistributedLock;
