@@ -32,7 +32,8 @@ public class ReservationService {
 
     Reservation reservation = new Reservation(user, seatScheduleInfo);
     reservationRepository.save(reservation);
-    waitingQueueService.deleteAtQueue(seatScheduleInfo.getSchedule().getId(), user.getUsername());
+    waitingQueueService.deleteSelectingUser(seatScheduleInfo.getSchedule().getId(),
+        user.getUsername());
   }
 
   @Transactional
