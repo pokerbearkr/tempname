@@ -96,34 +96,33 @@ public class ReservationService {
 
     //유저가 해당 회차에 선택한 좌석 검증
     String redisSelectedKey = "user:scheduleSelected:" + userId + ":" + scheduleId;
-    Set<String> seatScheduleIds = redisTemplate.opsForSet().members(redisSelectedKey);
+    String selectedId = redisTemplate.opsForValue().get(redisSelectedKey);
 
-    if (seatScheduleIds == null || seatScheduleIds.isEmpty()) {
+    if (selectedId == null) {
       throw new IllegalStateException("선택한 좌석이 없습니다.");
     }
 
-    List<SeatScheduleInfo> seatsScheduleInfos = seatScheduleInfoRepository.findAllById(
-            seatScheduleIds.stream().map(Long::valueOf).collect(Collectors.toList())
-    );
+    SeatScheduleInfo seatScheduleInfo = seatScheduleInfoRepository.findById(Long.valueOf(selectedId))
+            .orElseThrow(() -> new EntityNotFoundException("좌석 정보를 찾을 수 없습니다."));
 
-    for (SeatScheduleInfo seatScheduleInfo : seatsScheduleInfos) {
-      String key = "seatStatus:" + seatScheduleInfo.getId();
-      String status = redisTemplate.opsForValue().get(key);
-      if (!"SELECTED".equals(status)) {
-        throw new IllegalStateException("좌석 상태가 유효하지 않습니다. 다시 선택해주세요.");
-      }
+    //해당 좌석의 상태 검증
+    String redisStatusHashKey = "seatStatus:" + scheduleId;
+    Object redisStatusObj = redisTemplate.opsForHash().get(redisStatusHashKey, selectedId);
+
+    if (redisStatusObj == null || !redisStatusObj.toString().equals(SeatStatus.SELECTED.name())) {
+      throw new IllegalStateException("좌석 상태가 유효하지 않습니다. 다시 선택해주세요.");
     }
 
-    //검증 끝난 데이터에 대해 예매 정보 생성 및 상태 업데이트
-    for (SeatScheduleInfo seatScheduleInfo : seatsScheduleInfos) {
-      Reservation reservation = new Reservation(user, seatScheduleInfo);
-      reservationRepository.save(reservation);
+    //예매 정보 생성
+    Reservation reservation = new Reservation(user, seatScheduleInfo);
+    reservationRepository.save(reservation);
 
-      seatScheduleInfo.updateSeatScheduleInfoStatus(SeatStatus.HOLD); //결제 진행 중!
-      seatScheduleInfoRepository.save(seatScheduleInfo);
+    //좌석 상태 결제 진행 중으로 변경
+    seatScheduleInfo.updateSeatScheduleInfoStatus(SeatStatus.HOLD);
+    seatScheduleInfoRepository.save(seatScheduleInfo);
+    redisTemplate.opsForHash().put(redisStatusHashKey, selectedId, SeatStatus.HOLD.name());
 
-      String redisSeatKey = "seatStatus:" + seatScheduleInfo.getId();
-      redisTemplate.opsForValue().set(redisSeatKey, SeatStatus.HOLD.name(), Duration.ofMinutes(60));
-    }
+    //유저가 선점한 좌석 정보 - 결제 진행 상태일 때의 만료 시간 1시간
+    redisTemplate.expire(redisSelectedKey, Duration.ofMinutes(60));
   }
 }

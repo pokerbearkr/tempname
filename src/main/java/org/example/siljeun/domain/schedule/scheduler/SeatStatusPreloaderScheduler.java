@@ -18,12 +18,12 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class TicketingRedisScheduler {
+public class SeatStatusPreloaderScheduler {
     private final ScheduleRepository scheduleRepository;
     private final SeatScheduleInfoRepository seatScheduleInfoRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
-    @Scheduled(fixedRate = 60_000)
+    @Scheduled(fixedRate = 300_000)
     public void loadSeatStatusToRedis() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime fiveMinutesLater = now.plusMinutes(5); //티켓팅 시작 시간이 임박한 회차에 대해 미리 Redis에 정보 적재

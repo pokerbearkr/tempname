@@ -42,8 +42,12 @@ public class SeatScheduleInfoService {
 
         //userId와 schedule Id가 key이고 seatSchduleInfoId로 구성된 Set이 value인 형태로 저장
         String redisSelectedKey = "user:scheduleSelected" + userId + ":" + scheduleId;
-        redisTemplate.opsForSet().add(redisSelectedKey, seatScheduleInfoId.toString());
-        //key에 해당하는 set 데이터를 TTL 5분으로 업데이트
+
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(redisSelectedKey))) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "1인당 1개의 좌석만 예약 가능합니다.");
+        }
+
+        redisTemplate.opsForValue().set(redisSelectedKey, seatScheduleInfoId.toString());
         redisTemplate.expire(redisSelectedKey, Duration.ofMinutes(5));
 
         //seatScheduleInfoId의 seatStatus 상태 변경
