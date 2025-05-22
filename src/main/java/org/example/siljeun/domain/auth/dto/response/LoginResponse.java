@@ -1,4 +1,4 @@
-package org.example.siljeun.domain.auth.dto;
+package org.example.siljeun.domain.auth.dto.response;
 
 import lombok.RequiredArgsConstructor;
 
