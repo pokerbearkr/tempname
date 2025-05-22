@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,10 +28,10 @@ public class SeatScheduleInfoController {
         return ResponseEntity.ok("좌석이 선택되었습니다.");
     }
 
-//    @GetMapping("/schedule/{scheduleId}/seat-schedule-info")
-//    public ResponseEntity<List<SeatScheduleInfoResponse>> getSeatScheduleInfos(
-//            @PathVariable Long scheduleId
-//    ){
-//        return ResponseEntity.ok(new List<SeatScheduleInfoResponse> seats);
-//    }
+    @GetMapping("/schedule/{scheduleId}/seat-schedule-info")
+    public ResponseEntity<Map<String, String>> getSeatScheduleInfos(
+            @PathVariable Long scheduleId
+    ){
+        return ResponseEntity.ok(seatScheduleInfoService.getSeatStatusMap(scheduleId));
+    }
 }

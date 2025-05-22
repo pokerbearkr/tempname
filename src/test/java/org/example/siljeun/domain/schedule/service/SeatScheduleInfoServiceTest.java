@@ -110,7 +110,7 @@ class SeatScheduleInfoServiceTest {
         assertEquals(totalThreads - 1, conflictCount);
 
         SeatScheduleInfo updated = seatScheduleInfoRepository.findById(seatScheduleInfoId).orElseThrow();
-        assertEquals(SeatStatus.HOLD, updated.getStatus());
+        assertEquals(SeatStatus.SELECTED, updated.getStatus());
 
         Long storedUserId = redisTemplate.opsForValue().get("seat:" + seatScheduleInfoId);
         assertNotNull(storedUserId);

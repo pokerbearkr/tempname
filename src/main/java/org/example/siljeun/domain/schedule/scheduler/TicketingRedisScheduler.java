@@ -6,6 +6,7 @@ import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
 import org.example.siljeun.domain.schedule.repository.SeatScheduleInfoRepository;
 import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,9 @@ import java.util.stream.Collectors;
 public class TicketingRedisScheduler {
     private final ScheduleRepository scheduleRepository;
     private final SeatScheduleInfoRepository seatScheduleInfoRepository;
-    private final RedisTemplate<String, Long> redisTemplate;
+
+    @Qualifier("redisStatusTemplate")
+    private final RedisTemplate<String, String> redisStatusTemplate;
 
     @Scheduled(fixedRate = 60_000)
     public void loadSeatStatusToRedis() {
@@ -31,20 +34,13 @@ public class TicketingRedisScheduler {
         List<Schedule> openedSchedules = scheduleRepository.findAllByTicketingStartTimeBetween(now, fiveMinutesLater);
 
         for (Schedule schedule : openedSchedules) {
-            Long scheduleId = schedule.getId();
-            String redisKey = "seatStatus:" + scheduleId;
-
             List<SeatScheduleInfo> seatScheduleInfos = seatScheduleInfoRepository.findAllBySchedule(schedule);
 
-            Map<String, String> seatStatusMap = seatScheduleInfos.stream()
-                    .collect(Collectors.toMap(
-                            seat -> String.valueOf(seat.getId()),
-                            seat -> seat.getStatus().name()
-                    ));
-
-            redisTemplate.opsForHash().putAll(redisKey, seatStatusMap);
-            log.info("✅ Redis에 좌석 상태 저장 완료 [key: {}] seatCount: {}", redisKey, seatStatusMap.size());
+            for(SeatScheduleInfo seatScheduleInfo : seatScheduleInfos){
+                String key = "seatStatus:" +  seatScheduleInfo.getId().toString();
+                String value = seatScheduleInfo.getStatus().name();
+                redisStatusTemplate.opsForValue().set(key, value);
+            }
         }
     }
-
 }

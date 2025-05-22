@@ -39,4 +39,13 @@ public class RedisConfig {
         redisTemplate.setValueSerializer(new GenericToStringSerializer<>(Long.class)); // Long 값 직렬화
         return redisTemplate;
     }
+
+    @Bean
+    public RedisTemplate<String, String> redisStatusTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(connectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        return redisTemplate;
+    }
 }
