@@ -17,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -58,6 +59,7 @@ class SeatScheduleInfoServiceTest {
     private ConcertRepository concertRepository;
 
     @Autowired
+    @Qualifier("redisLongTemplate")
     private RedisTemplate<String, Long> redisTemplate;
 
     private Seat seat;

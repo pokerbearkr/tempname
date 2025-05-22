@@ -1,12 +1,10 @@
 package org.example.siljeun.domain.schedule.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
 import org.example.siljeun.domain.schedule.repository.SeatScheduleInfoRepository;
-import org.example.siljeun.domain.seat.entity.QSeatScheduleInfo;
 import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.seat.enums.SeatStatus;
 import org.example.siljeun.global.lock.DistributedLock;
@@ -18,21 +16,28 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class SeatScheduleInfoService {
     private final SeatScheduleInfoRepository seatScheduleInfoRepository;
     private final ScheduleRepository scheduleRepository;
-
-    private final RedisTemplate<String, Long> redisTemplate;
-
-    @Qualifier("redisStatusTemplate")
+    private final RedisTemplate<String, Long> redisSeatUserTemplate;
     private final RedisTemplate<String, String> redisStatusTemplate;
+
+    public SeatScheduleInfoService(
+            SeatScheduleInfoRepository seatScheduleInfoRepository,
+            ScheduleRepository scheduleRepository,
+            @Qualifier("redisLongTemplate") RedisTemplate<String, Long> redisSeatUserTemplate,
+            @Qualifier("redisStringTemplate") RedisTemplate<String, String> redisStatusTemplate
+    ){
+        this.seatScheduleInfoRepository = seatScheduleInfoRepository;
+        this.scheduleRepository = scheduleRepository;
+        this.redisSeatUserTemplate = redisSeatUserTemplate;
+        this.redisStatusTemplate = redisStatusTemplate;
+    }
 
     @DistributedLock(key = "'seat:' + #seatScheduleInfoId")
     public void selectSeat(Long userId, Long seatScheduleInfoId) {
@@ -49,7 +54,7 @@ public class SeatScheduleInfoService {
         seatScheduleInfoRepository.save(seatScheduleInfo);
 
         String redisKey = "seat:" + seatScheduleInfoId;
-        redisTemplate.opsForValue().set(redisKey, userId, Duration.ofMinutes(5));
+        redisSeatUserTemplate.opsForValue().set(redisKey, userId, Duration.ofMinutes(5));
 
         String redisStatusKey = "seatStatus:" + seatScheduleInfoId;
         redisStatusTemplate.opsForValue().set(redisStatusKey, seatScheduleInfo.getStatus().name(), Duration.ofMinutes(5));

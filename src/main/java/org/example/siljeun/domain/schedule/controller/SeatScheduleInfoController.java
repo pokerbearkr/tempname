@@ -3,7 +3,9 @@ package org.example.siljeun.domain.schedule.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.siljeun.domain.schedule.service.SeatScheduleInfoService;
 import org.example.siljeun.domain.seat.dto.response.SeatScheduleInfoResponse;
+import org.example.siljeun.global.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,10 +23,10 @@ public class SeatScheduleInfoController {
 
     @PostMapping("/seat-schedule-info/{seatScheduleInfoId}")
     public ResponseEntity<String> selectSeat(
-        @PathVariable Long seatScheduleInfoId
+        @PathVariable Long seatScheduleInfoId,
+        @AuthenticationPrincipal CustomUserDetails userDetails
     ){
-        seatScheduleInfoService.selectSeat(1L, seatScheduleInfoId);
-
+        seatScheduleInfoService.selectSeat(userDetails.getUserId(), seatScheduleInfoId);
         return ResponseEntity.ok("좌석이 선택되었습니다.");
     }
 

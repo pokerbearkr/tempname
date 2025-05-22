@@ -18,13 +18,20 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class TicketingRedisScheduler {
     private final ScheduleRepository scheduleRepository;
     private final SeatScheduleInfoRepository seatScheduleInfoRepository;
-
-    @Qualifier("redisStatusTemplate")
     private final RedisTemplate<String, String> redisStatusTemplate;
+
+    public TicketingRedisScheduler(
+            ScheduleRepository scheduleRepository,
+            SeatScheduleInfoRepository seatScheduleInfoRepository,
+            @Qualifier("redisStringTemplate") RedisTemplate<String, String> redisStatusTemplate
+    ){
+        this.scheduleRepository = scheduleRepository;
+        this.seatScheduleInfoRepository = seatScheduleInfoRepository;
+        this.redisStatusTemplate = redisStatusTemplate;
+    }
 
     @Scheduled(fixedRate = 60_000)
     public void loadSeatStatusToRedis() {

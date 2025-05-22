@@ -6,6 +6,7 @@ import org.example.siljeun.global.security.CustomOAuth2SuccessHandler;
 import org.example.siljeun.global.security.JwtAuthenticationFilter;
 import org.example.siljeun.global.security.JwtUtil;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -30,14 +32,14 @@ public class SecurityConfig {
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/**", "/oauth2/**", "/login/**").permitAll()
+            .requestMatchers("/auth/**", "/oauth2/**", "/login/**", "/ws/**", "/ws").permitAll()
             .anyRequest().authenticated()
         )
-        .oauth2Login(oauth2 -> oauth2
-            .successHandler(customOAuth2SuccessHandler)
-            .defaultSuccessUrl("/auth/oauth2/success", true)
-            .failureUrl("/auth/oauth2/failure")
-        )
+//        .oauth2Login(oauth2 -> oauth2
+//            .successHandler(customOAuth2SuccessHandler)
+//            .defaultSuccessUrl("/auth/oauth2/success", true)
+//            .failureUrl("/auth/oauth2/failure")
+//        )
         .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userDetailsService),
             UsernamePasswordAuthenticationFilter.class);
 

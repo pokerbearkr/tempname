@@ -2,6 +2,9 @@ package org.example.siljeun.domain.concert.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.example.siljeun.domain.concert.dto.request.ConcertCreateRequest;
 import org.example.siljeun.domain.concert.dto.request.ConcertUpdateRequest;
@@ -27,6 +30,7 @@ public class ConcertServiceImpl implements ConcertService {
   private final VenueRepository venueRepository;
   private final UserRepository userRepository;
   private final ScheduleRepository scheduleRepository;
+  private final ConcertCacheService concertCacheService;
 
 
   @Override
@@ -84,6 +88,9 @@ public class ConcertServiceImpl implements ConcertService {
 
   @Override
   public ConcertDetailResponse getConcertDetail(Long concertId) {
+
+    concertCacheService.increaseViewCount(concertId);
+
     Concert concert = concertRepository.findById(concertId)
         .orElseThrow(() -> new EntityNotFoundException("해당 공연이 존재하지 않습니다."));
 
@@ -110,5 +117,25 @@ public class ConcertServiceImpl implements ConcertService {
         venueResponse,
         schedules
     );
+  }
+
+  @Override
+  public List<ConcertSimpleResponse> getPopularConcerts() {
+    List<Long> topIds = concertCacheService.getTopConcertIds(7);
+    List<Concert> concerts = concertRepository.findByIdIn(topIds);
+
+    Map<Long, Concert> concertMap = concerts.stream()
+        .collect(Collectors.toMap(Concert::getId, c -> c));
+
+    return topIds.stream()
+        .map(concertMap::get)
+        .filter(Objects::nonNull)
+        .map(c -> new ConcertSimpleResponse(
+            c.getId(),
+            c.getTitle(),
+            c.getVenue().getName(),
+            c.getCategory().name()
+        ))
+        .toList();
   }
 }
