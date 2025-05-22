@@ -16,6 +16,9 @@ public enum ErrorCode {
   NOT_FOUND_SCHEDULE(404, "공연 회차 정보가 존재하지 않습니다."),
   MISSING_HEADER(400, "필수 헤더값이 누락되었습니다."),
 
+  // seatScheduleInfo
+  NOT_FOUNT_SEAT_SCHEDULE_INFO(404, "해당 공연에 대한 좌석 정보가 존재하지 않습니다."),
+
   // jwt
   UNAUTHORIZED(401, "토큰이 유효하지 않습니다."),
 

@@ -1,8 +1,5 @@
 package org.example.siljeun.domain.reservation.entity;
 
-import static org.example.siljeun.domain.reservation.enums.ReservationStatus.COMPLETE;
-import static org.example.siljeun.domain.reservation.enums.ReservationStatus.PENDING;
-
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,7 +18,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.siljeun.domain.reservation.dto.request.UpdatePriceRequest;
 import org.example.siljeun.domain.reservation.enums.Discount;
-import org.example.siljeun.domain.reservation.enums.ReservationStatus;
 import org.example.siljeun.domain.reservation.enums.TicketReceipt;
 import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.user.entity.User;
@@ -60,10 +56,6 @@ public class Reservation {
   @Enumerated(EnumType.STRING)
   private Discount discount;
 
-  @Column(nullable = false)
-  @Enumerated(EnumType.STRING)
-  private ReservationStatus status;
-
   @CreatedDate
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
@@ -74,12 +66,6 @@ public class Reservation {
     this.price = seatScheduleInfo.getPrice();
     this.ticketReceipt = TicketReceipt.PICKUP;
     this.discount = Discount.GENERAL;
-    this.status = PENDING;
-  }
-
-  public void updateReservationStatus(Reservation reservation) {
-    this.status = (reservation.status == PENDING) ?
-        COMPLETE : PENDING;
   }
 
   public void updateTicketPrice(UpdatePriceRequest dto) {

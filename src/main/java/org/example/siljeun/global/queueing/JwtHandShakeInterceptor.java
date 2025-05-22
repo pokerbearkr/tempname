@@ -8,6 +8,7 @@ import org.example.siljeun.domain.reservation.exception.CustomException;
 import org.example.siljeun.domain.reservation.exception.ErrorCode;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
 import org.example.siljeun.global.security.JwtUtil;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -30,27 +31,26 @@ public class JwtHandShakeInterceptor implements HandshakeInterceptor {
       WebSocketHandler wsHandler,
       Map<String, Object> attributes) throws Exception {
 
+    HttpHeaders headers = request.getHeaders();
     URI uri = request.getURI();
     MultiValueMap<String, String> params = UriComponentsBuilder.fromUri(uri).build()
         .getQueryParams();
 
+    String token = headers.getFirst("Authorization");
     String scheduleId = params.getFirst("scheduleId");
 
-    if (StringUtils.isBlank(scheduleId) || !scheduleRepository.existsById(
-        Long.valueOf(scheduleId))) {
-      throw new CustomException(ErrorCode.MISSING_HEADER);
-    }
-
-    attributes.put("scheduleId", scheduleId);
-
-    String jwt = params.getFirst("token");
-
-    if (!jwtUtil.validateToken(jwt)) {
+    if (!jwtUtil.validateToken(token)) {
       return false;
     }
 
-    String username = jwtUtil.getUsername(jwt);
+    if (StringUtils.isBlank(scheduleId) || !scheduleRepository.existsById(
+        Long.valueOf(scheduleId))) {
+      throw new CustomException(ErrorCode.MISSING_HEADER); // or return false
+    }
+
+    String username = jwtUtil.getUsername(token);
     attributes.put("username", username);
+    attributes.put("scheduleId", scheduleId);
 
     return true;
   }
