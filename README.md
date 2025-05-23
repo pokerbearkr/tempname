@@ -45,7 +45,6 @@
 | Cache      | Redis |
 | CI/CD      | GitHub Actions |
 | Auth       | JWT, Kakao OAuth |
-| Infra      | (EC2 / Render 등 배포환경 작성)
 
 ---
 
