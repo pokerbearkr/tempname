@@ -38,7 +38,14 @@ public class VenueServiceImpl implements VenueService {
 
   @Override
   public void deleteVenue(Long venueId) {
-    venueRepository.deleteById(venueId);
+    Venue venue = venueRepository.findById(venueId)
+        .orElseThrow(() -> new EntityNotFoundException("해당 공연장을 찾을 수 없습니다."));
+
+    if (venue.isDeleted()) {
+      throw new IllegalStateException("이미 삭제된 공연장입니다.");
+    }
+
+    venue.softDelete();
   }
 
 }
