@@ -109,14 +109,16 @@ public class SeatScheduleInfoService {
     }
 
     @Transactional
-    public void updateSeatSchedulerInfoStatus(Long scheduleId, Long seatScheduleInfoId, SeatStatus seatStatus){
+    public void updateSeatSchedulerInfoStatus(Long seatScheduleInfoId, SeatStatus seatStatus){
+
+        SeatScheduleInfo seatScheduleInfo = seatScheduleInfoRepository.findById(seatScheduleInfoId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 회차별 좌석 정보가 존재하지 않습니다."));
+
+        Long scheduleId = seatScheduleInfo.getSchedule().getId();
         String redisKey = RedisKeyProvider.seatStatusKey(scheduleId);
         String fieldKey = seatScheduleInfoId.toString();
 
         String status = (String) redisTemplate.opsForHash().get(redisKey, fieldKey);
-
-        SeatScheduleInfo seatScheduleInfo = seatScheduleInfoRepository.findById(seatScheduleInfoId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 회차별 좌석 정보가 존재하지 않습니다."));
 
         seatScheduleInfo.updateSeatScheduleInfoStatus(seatStatus);
     }
