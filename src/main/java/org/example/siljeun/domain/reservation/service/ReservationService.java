@@ -2,6 +2,8 @@ package org.example.siljeun.domain.reservation.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.example.siljeun.domain.reservation.dto.request.ReservationCreateRequest;
 import org.example.siljeun.domain.reservation.dto.request.UpdatePriceRequest;
 import org.example.siljeun.domain.reservation.dto.response.ReservationInfoResponse;
 import org.example.siljeun.domain.reservation.entity.Reservation;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
@@ -85,14 +88,16 @@ public class ReservationService {
   }
 
   @Transactional
-  public void createReservation(Long scheduleId, Long userId){
+  public void createReservation(ReservationCreateRequest reservationCreateRequest, Long userId){
 
     //유저 확인
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
 
+    Long scheduleId = reservationCreateRequest.scheduleId();
     //유저가 해당 회차에 선택한 좌석 검증
-    String redisSelectedKey = "user:scheduleSelected:" + userId + ":" + scheduleId;
+    String redisSelectedKey = "user:scheduleSelected" + userId + ":" + scheduleId;
+    log.info("예매 정보 생성 시도 user : " + userId + "scheduleId : " + scheduleId + " key) " + redisSelectedKey );
     String selectedId = redisTemplate.opsForValue().get(redisSelectedKey);
 
     if (selectedId == null) {

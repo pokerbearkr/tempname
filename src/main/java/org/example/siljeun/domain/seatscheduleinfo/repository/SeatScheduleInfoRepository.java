@@ -9,4 +9,6 @@ import java.util.List;
 public interface SeatScheduleInfoRepository extends JpaRepository<SeatScheduleInfo, Long> {
 
     List<SeatScheduleInfo> findAllBySchedule(Schedule schedule);
+
+    void deleteBySchedule(Schedule schedule);
 }

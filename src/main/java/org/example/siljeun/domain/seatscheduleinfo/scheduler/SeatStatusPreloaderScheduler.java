@@ -23,10 +23,10 @@ public class SeatStatusPreloaderScheduler {
     private final SeatScheduleInfoRepository seatScheduleInfoRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
-    @Scheduled(fixedRate = 300_000)
+    @Scheduled(fixedRate = 60_000)
     public void loadSeatStatusToRedis() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime fiveMinutesLater = now.plusMinutes(5); //티켓팅 시작 시간이 임박한 회차에 대해 미리 Redis에 정보 적재
+        LocalDateTime fiveMinutesLater = now.plusMinutes(5);
 
         List<Schedule> openedSchedules = scheduleRepository.findAllByTicketingStartTimeBetween(now, fiveMinutesLater);
 
@@ -41,6 +41,7 @@ public class SeatStatusPreloaderScheduler {
             }
 
             redisTemplate.opsForHash().putAll(key, seatStatusMap);
+            log.info("✅ scheduleId: {}의 seatSchedulerInfos 적재 완료", schedule.getId());
         }
     }
 }

@@ -25,6 +25,9 @@ public class SeatService {
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 공연장을 찾을 수 없습니다."));         //Throw 예외 설정 필요
 
+        if (seatCreateRequests.size() > venue.getSeatCapacity()) {
+            throw new IllegalArgumentException("좌석 수가 공연장 수용 인원(capacity)을 초과했습니다.");
+        }
         //공연장 ID, 구역, 열, 번호를 바탕으로 고유하도록 설정하였으나
         //좌석 정보가 중복되는 경우를 다루지 않아 추후 리팩토링이 필요함
         List<Seat> seats = seatCreateRequests.stream()

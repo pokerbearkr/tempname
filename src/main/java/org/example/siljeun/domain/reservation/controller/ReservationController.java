@@ -2,6 +2,7 @@ package org.example.siljeun.domain.reservation.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.siljeun.domain.reservation.dto.request.ReservationCreateRequest;
 import org.example.siljeun.domain.reservation.dto.request.UpdatePriceRequest;
 import org.example.siljeun.domain.reservation.dto.response.ReservationInfoResponse;
 import org.example.siljeun.domain.reservation.service.ReservationService;
@@ -46,10 +47,10 @@ public class ReservationController {
 
   @PostMapping()
   public ResponseEntity<ResponseDto<Void>> createReservation(
-          @PathVariable Long scheduleId,
+          @RequestBody @Valid ReservationCreateRequest reservationCreateRequest,
           @AuthenticationPrincipal PrincipalDetails userDetails
   ){
-    reservationService.createReservation(scheduleId, userDetails.getUserId());
+    reservationService.createReservation(reservationCreateRequest, userDetails.getUserId());
     return ResponseEntity.ok(ResponseDto.success("결제 진행하기", null));
   }
 }

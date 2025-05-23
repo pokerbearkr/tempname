@@ -2,6 +2,7 @@ package org.example.siljeun.domain.seatscheduleinfo.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.siljeun.domain.seatscheduleinfo.service.SeatScheduleInfoService;
+import org.example.siljeun.global.dto.ResponseDto;
 import org.example.siljeun.global.security.PrincipalDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,13 +22,13 @@ public class SeatScheduleInfoController {
     private final SeatScheduleInfoService seatScheduleInfoService;
 
     @PostMapping("/seat-schedule-infos/{seatScheduleInfoId}")
-    public ResponseEntity<String> selectSeat(
+    public ResponseEntity<ResponseDto<Void>> selectSeat(
             @PathVariable Long scheduleId,
             @PathVariable Long seatScheduleInfoId,
             @AuthenticationPrincipal PrincipalDetails userDetails
     ) {
         seatScheduleInfoService.selectSeat(userDetails.getUserId(), scheduleId, seatScheduleInfoId);
-        return ResponseEntity.ok("좌석이 선택되었습니다.");
+        return ResponseEntity.ok(ResponseDto.success( "좌석이 선택되었습니다. seatScheduleInfoId : " + seatScheduleInfoId.toString(), null));
     }
 
     @GetMapping("/seat-schedule-infos")

@@ -1,8 +1,10 @@
 package org.example.siljeun.domain.schedule.service;
 
 import jakarta.persistence.EntityNotFoundException;
+
 import java.util.List;
 import java.util.NoSuchElementException;
+
 import lombok.RequiredArgsConstructor;
 import org.example.siljeun.domain.concert.entity.Concert;
 import org.example.siljeun.domain.concert.repository.ConcertRepository;
@@ -73,22 +75,23 @@ public class ScheduleServiceImpl implements ScheduleService {
                 schedule.getTicketingStartTime());
     }
 
-  @Override
-  @Transactional
-  public void deleteSchedule(Long id) {
-    if (!scheduleRepository.existsById(id)) {
-      throw new EntityNotFoundException("해당 회차가 존재하지 않습니다.");
-    }
-    scheduleRepository.deleteById(id);
-  }
+    @Override
+    @Transactional
+    public void deleteSchedule(Long id) {
+        Schedule schedule = scheduleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("해당 회차가 존재하지 않습니다."));
 
-  @Override
-  @Transactional(readOnly = true)
-  public List<ScheduleSimpleResponse> getSchedulesByConcertId(Long concertId) {
-    List<Schedule> schedules = scheduleRepository.findByConcertIdWithConcert(concertId);
-    return schedules.stream()
-        .map(
-            s -> new ScheduleSimpleResponse(s.getId(), s.getStartTime(), s.getTicketingStartTime()))
-        .toList();
-  }
+        seatScheduleInfoRepository.deleteBySchedule(schedule);
+        scheduleRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ScheduleSimpleResponse> getSchedulesByConcertId(Long concertId) {
+        List<Schedule> schedules = scheduleRepository.findByConcertIdWithConcert(concertId);
+        return schedules.stream()
+                .map(
+                        s -> new ScheduleSimpleResponse(s.getId(), s.getStartTime(), s.getTicketingStartTime()))
+                .toList();
+    }
 }
