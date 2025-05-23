@@ -1,4 +1,4 @@
-package org.example.siljeun.domain.seat.dto.response;
+package org.example.siljeun.domain.seatscheduleinfo.dto.response;
 
 public record SeatScheduleInfoResponse(
         Long seatScheduleInfoId,

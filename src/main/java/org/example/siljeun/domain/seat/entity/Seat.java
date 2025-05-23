@@ -48,4 +48,8 @@ public class Seat {
     public static Seat from(Venue venue, SeatCreateRequest request) {
         return new Seat(venue, request.section(), request.row(), request.column(), request.defaultGrade(), request.defaultPrice());
     }
+
+    public String seatNumber(){
+        return section + "구역 " + row + "열 " + column + "번";
+    }
 }
