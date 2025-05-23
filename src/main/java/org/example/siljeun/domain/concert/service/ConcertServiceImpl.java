@@ -18,6 +18,7 @@ import org.example.siljeun.domain.user.repository.UserRepository;
 import org.example.siljeun.domain.venue.dto.response.VenueSimpleResponse;
 import org.example.siljeun.domain.venue.entity.Venue;
 import org.example.siljeun.domain.venue.repository.VenueRepository;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,7 @@ public class ConcertServiceImpl implements ConcertService {
   private final UserRepository userRepository;
   private final ScheduleRepository scheduleRepository;
   private final ConcertCacheService concertCacheService;
+  private final RedisTemplate redisTemplate;
 
 
   @Override
@@ -89,6 +91,12 @@ public class ConcertServiceImpl implements ConcertService {
   @Override
   public ConcertDetailResponse getConcertDetail(Long concertId) {
 
+    ConcertDetailResponse cached = concertCacheService.getConcertDetailCache(concertId);
+    if (cached != null) {
+      concertCacheService.increaseViewCount(concertId);
+      return cached;
+    }
+
     concertCacheService.increaseViewCount(concertId);
 
     Concert concert = concertRepository.findById(concertId)
@@ -114,7 +122,7 @@ public class ConcertServiceImpl implements ConcertService {
         ))
         .toList();
 
-    return new ConcertDetailResponse(
+    ConcertDetailResponse response = new ConcertDetailResponse(
         concert.getId(),
         concert.getTitle(),
         concert.getDescription(),
@@ -122,6 +130,10 @@ public class ConcertServiceImpl implements ConcertService {
         venueResponse,
         schedules
     );
+
+    concertCacheService.saveConcertDetailCache(concertId, response);
+
+    return response;
   }
 
   @Override
@@ -148,4 +160,6 @@ public class ConcertServiceImpl implements ConcertService {
         ))
         .toList();
   }
+
+
 }
