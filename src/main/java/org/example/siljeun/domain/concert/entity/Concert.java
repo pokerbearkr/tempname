@@ -1,5 +1,6 @@
 package org.example.siljeun.domain.concert.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -42,6 +43,10 @@ public class Concert extends BaseEntity {
 
   private int cancelCharge;
 
+  @Column(nullable = false)
+  private Long viewCount = 0L;
+
+
   @Builder
   public Concert(String title, String description, ConcertCategory category, Venue venue,
       int cancelCharge) {
@@ -59,5 +64,9 @@ public class Concert extends BaseEntity {
     this.category = category;
     this.venue = venue;
     this.cancelCharge = cancelCharge;
+  }
+
+  public void addViewCount(Long count) {
+    this.viewCount += count;
   }
 }
