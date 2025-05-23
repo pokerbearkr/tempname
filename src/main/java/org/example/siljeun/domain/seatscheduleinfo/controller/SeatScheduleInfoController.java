@@ -21,6 +21,15 @@ public class SeatScheduleInfoController {
 
     private final SeatScheduleInfoService seatScheduleInfoService;
 
+    @PostMapping("/seat-schedule-infos")
+    public ResponseEntity<ResponseDto<Void>> forceSeatScheduleInfoInRedis(
+            @PathVariable Long scheduleId
+    )
+    {
+        seatScheduleInfoService.forceSeatScheduleInfoInRedis(scheduleId);
+        return ResponseEntity.ok(ResponseDto.success("Redis 적재 완료 scheduleId : " + scheduleId, null));
+    }
+
     @PostMapping("/seat-schedule-infos/{seatScheduleInfoId}")
     public ResponseEntity<ResponseDto<Void>> selectSeat(
             @PathVariable Long scheduleId,

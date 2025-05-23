@@ -37,6 +37,7 @@ public class SeatScheduleInfoService {
         Schedule schedule = seatScheduleInfo.getSchedule();
 
         if(schedule.getTicketingStartTime().isAfter(LocalDateTime.now())){
+            log.info("예매 미오픈.");
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "예매 불가능한 시간입니다. 예매 오픈 시간 : " + schedule.getTicketingStartTime());
         }
 
@@ -93,5 +94,21 @@ public class SeatScheduleInfoService {
         }
 
         return seatStatusMap;
+    }
+
+    public void forceSeatScheduleInfoInRedis(Long scheduleId){
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 회차가 존재하지 않습니다."));
+
+        List<SeatScheduleInfo> seatInfos = seatScheduleInfoRepository.findAllBySchedule(schedule);
+
+        String redisHashKey = "seatStatus:" + schedule.getId();
+        Map<String, String> seatStatusMap = new HashMap<>();
+
+        for (SeatScheduleInfo seat : seatInfos) {
+            seatStatusMap.put(seat.getId().toString(), seat.getStatus().name());
+        }
+
+        redisTemplate.opsForHash().putAll(redisHashKey, seatStatusMap);
     }
 }
