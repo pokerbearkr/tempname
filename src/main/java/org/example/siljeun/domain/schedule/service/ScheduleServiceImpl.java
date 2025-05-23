@@ -11,6 +11,11 @@ import org.example.siljeun.domain.schedule.dto.request.ScheduleUpdateRequest;
 import org.example.siljeun.domain.schedule.dto.response.ScheduleSimpleResponse;
 import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
+import org.example.siljeun.domain.schedule.repository.SeatScheduleInfoRepository;
+import org.example.siljeun.domain.seat.entity.Seat;
+import org.example.siljeun.domain.seat.entity.SeatScheduleInfo;
+import org.example.siljeun.domain.seat.enums.SeatStatus;
+import org.example.siljeun.domain.venue.repository.VenueSeatRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,37 +24,54 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ScheduleServiceImpl implements ScheduleService {
 
-  private final ScheduleRepository scheduleRepository;
-  private final ConcertRepository concertRepository;
+    private final ScheduleRepository scheduleRepository;
+    private final ConcertRepository concertRepository;
+    private final VenueSeatRepository venueSeatRepository;
+    private final SeatScheduleInfoRepository seatScheduleInfoRepository;
 
-  @Override
-  @Transactional
-  public ScheduleSimpleResponse createSchedule(ScheduleCreateRequest request) {
-    Concert concert = concertRepository.findById(request.concertId())
-        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 공연입니다."));
+    @Override
+    @Transactional
+    public ScheduleSimpleResponse createSchedule(ScheduleCreateRequest request) {
+        Concert concert = concertRepository.findById(request.concertId())
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 공연입니다."));
 
-    Schedule schedule = new Schedule(
-        concert,
-        request.startTime(),
-        request.ticketingStartTime()
-    );
+        Schedule schedule = new Schedule(
+                concert,
+                request.startTime(),
+                request.ticketingStartTime()
+        );
 
-    Schedule saved = scheduleRepository.save(schedule);
-    return new ScheduleSimpleResponse(saved.getId(), saved.getStartTime(),
-        saved.getTicketingStartTime());
-  }
+        Schedule saved = scheduleRepository.save(schedule);
 
-  @Override
-  @Transactional
-  public ScheduleSimpleResponse updateSchedule(Long id, ScheduleUpdateRequest request) {
-    Schedule schedule = scheduleRepository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("해당 회차가 존재하지 않습니다."));
+        //회차 생성 시, 회차별 좌석 정보도 함께 생성
+        List<Seat> seats = venueSeatRepository.findByVenue(concert.getVenue());
 
-    schedule.update(request.startTime(), request.ticketingStartTime());
+        List<SeatScheduleInfo> seatInfos = seats.stream()
+                .map(seat -> SeatScheduleInfo.from(
+                        seat,
+                        schedule,
+                        SeatStatus.AVAILABLE,
+                        seat.getDefaultGrade(),
+                        seat.getDefaultPrice())
+                ).toList();
 
-    return new ScheduleSimpleResponse(schedule.getId(), schedule.getStartTime(),
-        schedule.getTicketingStartTime());
-  }
+        seatScheduleInfoRepository.saveAll(seatInfos);
+
+        return new ScheduleSimpleResponse(saved.getId(), saved.getStartTime(),
+                saved.getTicketingStartTime());
+    }
+
+    @Override
+    @Transactional
+    public ScheduleSimpleResponse updateSchedule(Long id, ScheduleUpdateRequest request) {
+        Schedule schedule = scheduleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("해당 회차가 존재하지 않습니다."));
+
+        schedule.update(request.startTime(), request.ticketingStartTime());
+
+        return new ScheduleSimpleResponse(schedule.getId(), schedule.getStartTime(),
+                schedule.getTicketingStartTime());
+    }
 
   @Override
   @Transactional

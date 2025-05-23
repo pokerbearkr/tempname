@@ -8,12 +8,15 @@ import lombok.Getter;
 @AllArgsConstructor
 public class PaymentConfirmRequestDto {
 
-	@JsonProperty("paymentKey")
-	private String paymentKey;
+  @JsonProperty("paymentKey")
+  private String paymentKey;
 
-	@JsonProperty("orderId")
-	private String orderId;
+  @JsonProperty("userId")
+  private Long userId;
 
-	@JsonProperty("amount")
-	private Long amount;
+  @JsonProperty("orderId")
+  private Long seatScheduleInfoId;
+
+  @JsonProperty("amount")
+  private Long amount;
 }

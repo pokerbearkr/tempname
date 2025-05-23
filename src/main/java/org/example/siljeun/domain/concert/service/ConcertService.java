@@ -18,4 +18,7 @@ public interface ConcertService {
 
   ConcertDetailResponse getConcertDetail(Long concertId);
 
+  List<ConcertSimpleResponse> getDailyPopularConcerts();
+
+  List<ConcertSimpleResponse> getWeeklyPopularConcerts();
 }
