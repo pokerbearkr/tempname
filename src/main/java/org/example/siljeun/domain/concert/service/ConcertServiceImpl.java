@@ -36,8 +36,8 @@ public class ConcertServiceImpl implements ConcertService {
   @Override
   @Transactional
   public Long createConcert(ConcertCreateRequest request, Long userId) {
-    Venue venue = venueRepository.findById(request.venuId())
-        .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 공연장입니다."));
+    Venue venue = venueRepository.findByIdAndDeletedAtIsNull(request.venuId())
+        .orElseThrow(() -> new EntityNotFoundException("존재하지 않거나 삭제된 공연장입니다."));
 
     Concert concert = Concert.builder()
         .title(request.title())
@@ -56,8 +56,8 @@ public class ConcertServiceImpl implements ConcertService {
     Concert concert = concertRepository.findById(concertId)
         .orElseThrow(() -> new EntityNotFoundException("해당 공연이 존재하지 않습니다."));
 
-    Venue venue = venueRepository.findById(request.venueId())
-        .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 공연장입니다."));
+    Venue venue = venueRepository.findByIdAndDeletedAtIsNull(request.venueId())
+        .orElseThrow(() -> new EntityNotFoundException("존재하지 않거나 삭제된 공연장입니다."));
 
     concert.update(
         request.title(),
@@ -93,6 +93,11 @@ public class ConcertServiceImpl implements ConcertService {
 
     Concert concert = concertRepository.findById(concertId)
         .orElseThrow(() -> new EntityNotFoundException("해당 공연이 존재하지 않습니다."));
+
+    Venue venue = concert.getVenue();
+    if (venue.isDeleted()) {
+      throw new IllegalStateException("해당 공연장은 삭제되어 공연 상세 정보를 조회할 수 없습니다.");
+    }
 
     VenueSimpleResponse venueResponse = new VenueSimpleResponse(
         concert.getVenue().getId(),
