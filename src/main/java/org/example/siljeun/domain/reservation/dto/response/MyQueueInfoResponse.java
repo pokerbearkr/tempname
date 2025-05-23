@@ -4,7 +4,7 @@ public record MyQueueInfoResponse(
     Long scheduleId,
     String username,
     Long rank,
-    Long acceptedRank
+    boolean isPassable
 ) {
 
 }
