@@ -26,12 +26,12 @@
 ---
 
 ## 와이어프레임
--[와이어 프레임](images/wireframe.png)
+-![와이어 프레임](images/wireframe.png)
 
 ---
 
 ## ERD & API 명세
--[ERD](images/erd.png)
+-![ERD](images/erd.png)
 
 -[API 명세서](https://www.notion.so/teamsparta/6-1e52dc3ef51480adbe2cc285458c44e2#1e52dc3ef514818e9226ed34c1f3563d)
 
