@@ -42,7 +42,8 @@ public class ReservationService {
 
     Reservation reservation = new Reservation(user, seatScheduleInfo);
     reservationRepository.save(reservation);
-    waitingQueueService.deleteAtQueue(seatScheduleInfo.getSchedule().getId(), user.getUsername());
+    waitingQueueService.deleteSelectingUser(seatScheduleInfo.getSchedule().getId(),
+        user.getUsername());
   }
 
   @Transactional
@@ -71,7 +72,7 @@ public class ReservationService {
     }
 
     reservationRepository.delete(reservation);
-    // Todo : 좌석 상태 변경
+    reservation.getSeatScheduleInfo().updateSeatScheduleInfoStatus(SeatStatus.AVAILABLE);
   }
 
   public ReservationInfoResponse findById(String username, Long reservationId) {

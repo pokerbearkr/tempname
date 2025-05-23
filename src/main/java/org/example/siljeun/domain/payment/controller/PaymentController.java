@@ -3,7 +3,9 @@ package org.example.siljeun.domain.payment.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.siljeun.domain.payment.dto.PaymentConfirmRequestDto;
 import org.example.siljeun.domain.payment.service.PaymentService;
+import org.example.siljeun.global.security.PrincipalDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,9 +29,11 @@ public class PaymentController {
   @GetMapping("/success")
   @ResponseBody
   public ResponseEntity<String> sandboxSuccess(@RequestParam String paymentKey,
-      @RequestParam Long userId,
+      @AuthenticationPrincipal PrincipalDetails userDetails,
       @RequestParam Long seatScheduleInfoId,
       @RequestParam Long amount) {
+    Long userId = userDetails.getUserId();
+
     System.out.println("결제 성공 콜백 도착");
     System.out.println("paymentKey: " + paymentKey);
     System.out.println("userId: " + userId);

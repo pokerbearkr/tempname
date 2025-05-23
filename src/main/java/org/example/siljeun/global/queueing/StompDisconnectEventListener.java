@@ -21,7 +21,8 @@ public class StompDisconnectEventListener {
     Long scheduleId = Long.valueOf((String) accessor.getSessionAttributes().get("scheduleId"));
 
     if (username != null && scheduleId != null) {
-      waitingQueueService.deleteAtQueue(scheduleId, username);
+      waitingQueueService.deleteWaitingUser(scheduleId, username);
+      waitingQueueService.deleteSelectingUser(scheduleId, username);
     }
   }
 }
