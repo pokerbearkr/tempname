@@ -18,7 +18,7 @@ public class SeatScheduleInfoController {
 
   private final SeatScheduleInfoService seatScheduleInfoService;
 
-  @PostMapping("/seat-schedule-info/{seatScheduleInfoId}")
+  @PostMapping("/seat-schedule-infos/{seatScheduleInfoId}")
   public ResponseEntity<String> selectSeat(
       @PathVariable Long seatScheduleInfoId,
       @AuthenticationPrincipal PrincipalDetails userDetails
@@ -28,7 +28,7 @@ public class SeatScheduleInfoController {
     return ResponseEntity.ok("좌석이 선택되었습니다.");
   }
 
-  @GetMapping("/schedule/{scheduleId}/seat-schedule-info")
+  @GetMapping("/schedules/{scheduleId}/seat-schedule-infos")
   public ResponseEntity<Map<String, String>> getSeatScheduleInfos(
       @PathVariable Long scheduleId
   ) {

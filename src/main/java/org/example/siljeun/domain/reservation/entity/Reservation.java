@@ -70,7 +70,7 @@ public class Reservation {
 
   public void updateTicketPrice(UpdatePriceRequest dto) {
     if (!StringUtils.isBlank(dto.ticketReceipt())) {
-      this.ticketReceipt = TicketReceipt.valueOf(dto.ticketReceipt());
+      this.ticketReceipt = TicketReceipt.valueOf(dto.ticketReceipt().toUpperCase());
     }
     if (!StringUtils.isBlank(dto.discount())) {
       this.discount = Discount.valueOf(dto.discount());
