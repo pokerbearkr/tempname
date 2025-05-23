@@ -40,7 +40,6 @@
 | 항목       | 사용 기술 |
 |------------|-----------|
 | Backend    | Spring Boot, JPA, Spring Security |
-| Frontend   | (작성자에 따라 추가) |
 | DB         | MySQL |
 | Cache      | Redis |
 | CI/CD      | GitHub Actions |
