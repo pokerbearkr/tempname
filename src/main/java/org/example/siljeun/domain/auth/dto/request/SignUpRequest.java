@@ -6,6 +6,7 @@ import org.example.siljeun.domain.user.enums.Role;
 public record SignUpRequest(String email,
                             String username,
                             String password,
+                            String name,
                             String nickname,
                             Role role,
                             Provider provider) {
