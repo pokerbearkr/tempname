@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.siljeun.global.entity.BaseEntity;
@@ -29,6 +30,8 @@ public class Venue extends BaseEntity {
   @Column(nullable = false)
   private Integer seatCapacity;
 
+  private LocalDate deletedAt;
+
   public Venue(String name, String location, int seatCapacity) {
     this.name = name;
     this.location = location;
@@ -39,5 +42,13 @@ public class Venue extends BaseEntity {
     this.name = name;
     this.location = location;
     this.seatCapacity = seatCapacity;
+  }
+
+  public void softDelete() {
+    this.deletedAt = LocalDate.now();
+  }
+
+  public boolean isDeleted() {
+    return this.deletedAt != null;
   }
 }

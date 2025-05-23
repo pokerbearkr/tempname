@@ -15,7 +15,7 @@ public class ReservationExceptionHandler {
   @ExceptionHandler(CustomException.class)
   public ResponseEntity<ResponseDto<Void>> reservationExceptionHandler(
       CustomException e) {
-    return ResponseEntity.status(e.getErrorCode())
+    return ResponseEntity.status(e.getErrorCode().getCode())
         .body(ResponseDto.fail(e.getMessage()));
   }
 

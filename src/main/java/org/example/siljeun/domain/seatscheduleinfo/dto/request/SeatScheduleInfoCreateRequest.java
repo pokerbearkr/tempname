@@ -1,4 +1,4 @@
-package org.example.siljeun.domain.seat.dto.request;
+package org.example.siljeun.domain.seatscheduleinfo.dto.request;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
