@@ -32,7 +32,7 @@ public class SecurityConfig {
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/**", "/oauth2/**", "/login/**", "/ws/**", "/ws").permitAll()
+            .requestMatchers("/auth/**", "/oauth2/**", "/login/**", "/ws/**", "/ws","/checkout.html","/payments","/success.html").permitAll()
             .anyRequest().authenticated()
         )
 //        .oauth2Login(oauth2 -> oauth2
