@@ -41,16 +41,16 @@ public class SeatScheduleInfoService {
 
         Schedule schedule = seatScheduleInfo.getSchedule();
         if(schedule.getTicketingStartTime().isAfter(LocalDateTime.now())){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "예매 불가능한 시간입니다. 예매 오픈 시간 : " + schedule.getTicketingStartTime());
+            throw new CustomException(ErrorCode.NOT_TICKETING_TIME);
         }
 
         if (!seatScheduleInfo.isAvailable()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 선점된 좌석입니다.");
+            throw new CustomException(ErrorCode.ALREADY_SELECTED_SEAT);
         }
 
         String redisSelectedKey = RedisKeyProvider.userSelectedSeatKey(userId, scheduleId);
         if (Boolean.TRUE.equals(redisTemplate.hasKey(redisSelectedKey))) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "1인당 1개의 좌석만 예약 가능합니다.");
+            throw new CustomException(ErrorCode.SEAT_LIMIT_ONE_PER_USER);
         }
 
         //DB 상태 변경
@@ -76,7 +76,7 @@ public class SeatScheduleInfoService {
     public Map<String, String> getSeatStatusMap(Long scheduleId) {
 
         Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 회차가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_SCHEDULE));
 
         List<SeatScheduleInfo> seatScheduleInfos = seatScheduleInfoRepository.findAllBySchedule(schedule);
         if(seatScheduleInfos.isEmpty()){
@@ -107,7 +107,7 @@ public class SeatScheduleInfoService {
 
     public void forceSeatScheduleInfoInRedis(Long scheduleId){
         Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 회차가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_SCHEDULE));
 
         List<SeatScheduleInfo> seatInfos = seatScheduleInfoRepository.findAllBySchedule(schedule);
 
