@@ -45,11 +45,11 @@ public class SeatScheduleInfoController {
         return ResponseEntity.ok(seatScheduleInfoService.getSeatStatusMap(scheduleId));
     }
 
-    @PatchMapping("/seat-schedule-infos")
-    public ResponseEntity<ResponseDto<Void>> updateSeatScheduleInfoStatus(
-            @RequestBody @Valid SeatScheduleUpdateStatusRequest seatScheduleRequest
-    ){
-        seatScheduleInfoService.updateSeatSchedulerInfoStatus(seatScheduleRequest.seatScheduleInfoId(), seatScheduleRequest.status());
-        return ResponseEntity.ok(ResponseDto.success("좌석의 상태가 변경되었습니다.", null));
-    }
+//    @PatchMapping("/seat-schedule-infos")
+//    public ResponseEntity<ResponseDto<Void>> updateSeatScheduleInfoStatus(
+//            @RequestBody @Valid SeatScheduleUpdateStatusRequest seatScheduleRequest
+//    ){
+//        seatScheduleInfoService.updateSeatSchedulerInfoStatus(seatScheduleRequest.seatScheduleInfoId(), seatScheduleRequest.status());
+//        return ResponseEntity.ok(ResponseDto.success("좌석의 상태가 변경되었습니다.", null));
+//    }
 }

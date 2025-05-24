@@ -15,7 +15,6 @@ import org.example.siljeun.domain.seatscheduleinfo.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.seat.enums.SeatStatus;
 import org.example.siljeun.domain.user.entity.User;
 import org.example.siljeun.domain.user.repository.UserRepository;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +29,6 @@ public class ReservationService {
   private final UserRepository userRepository;
   private final WaitingQueueService waitingQueueService;
   private final SeatScheduleInfoRepository seatScheduleInfoRepository;
-  private final RedisTemplate<String, String> redisTemplate;
-
 
   @Transactional
   public void save(Long userId, Long seatScheduleInfoId) {

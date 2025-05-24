@@ -28,7 +28,7 @@ public class PaymentService {
 
     paymentRepository.save(payment);
 
-    seatScheduleInfoService.updateSeatSchedulerInfoStatus(dto.getSeatScheduleInfoId(), SeatStatus.RESERVED);
+    //seatScheduleInfoService.updateSeatSchedulerInfoStatus(dto.getSeatScheduleInfoId(), SeatStatus.RESERVED);
     reservationService.save(dto.getUserId(), dto.getSeatScheduleInfoId());
   }
 }
