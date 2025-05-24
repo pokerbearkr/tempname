@@ -51,23 +51,31 @@ public class User extends BaseEntity {
   @Column(nullable = false)
   private Provider provider;
 
-  private String providerId;
+  private Long providerId;
 
   private LocalDateTime deletedAt;
 
-  public User(String email, String username, String password, String nickname, Role role,
-      Provider provider) {
+  // 로컬 회원 가입용 생성자
+  public User(String email, String username, String password, String name, String nickname,
+      Role role, Provider provider) {
     this.email = email;
     this.username = username;
     this.password = password;
+    this.name = name;
     this.nickname = nickname;
     this.role = role;
     this.provider = provider;
   }
 
-  public User(String email, String nickname, Provider provider, String providerId) {
+  // 소셜 회원 가입용 생성자
+  public User(String email, String username, String password, String name, String nickname,
+      Role role, Provider provider, Long providerId) {
     this.email = email;
+    this.username = username;
+    this.password = password;
+    this.name = name;
     this.nickname = nickname;
+    this.role = role;
     this.provider = provider;
     this.providerId = providerId;
   }

@@ -31,14 +31,17 @@ public class SecurityConfig {
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/**", "/oauth2/**", "/login/**", "/ws/**", "/ws","/checkout.html","/payments","/success.html").permitAll()
+            .requestMatchers("/auth/**", "/oauth/**", "/oauth2/**", "/login/**", "/ws/**", "/ws",
+                "/checkout.html", "/payments", "/success.html").permitAll()
             .anyRequest().authenticated()
         )
-//        .oauth2Login(oauth2 -> oauth2
-//            .successHandler(customOAuth2SuccessHandler)
-//            .defaultSuccessUrl("/auth/oauth2/success", true)
-//            .failureUrl("/auth/oauth2/failure")
-//        )
+        .oauth2Login(oauth2 -> oauth2
+            .successHandler(customOAuth2SuccessHandler)
+            .defaultSuccessUrl("/auth/oauth2/success")
+            .failureUrl("/auth/oauth2/failure")
+        )
+//        .formLogin(form -> form
+//            .loginPage("/login"))
         .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userDetailsService),
             UsernamePasswordAuthenticationFilter.class);
 

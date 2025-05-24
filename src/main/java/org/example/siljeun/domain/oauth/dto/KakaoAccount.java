@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record KakaoUserInfo(
-    Long id,                  // 회원 번호
-    KakaoAccount kakaoAccount // 카카오 계정 정보
+public record KakaoAccount(
+    KakaoProfile profile, // 프로필 정보(닉네임, 프로필 사진)
+    String email
 ) {
 
 }
