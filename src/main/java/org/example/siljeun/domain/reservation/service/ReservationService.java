@@ -13,6 +13,7 @@ import org.example.siljeun.domain.reservation.repository.ReservationRepository;
 import org.example.siljeun.domain.seatscheduleinfo.repository.SeatScheduleInfoRepository;
 import org.example.siljeun.domain.seatscheduleinfo.entity.SeatScheduleInfo;
 import org.example.siljeun.domain.seat.enums.SeatStatus;
+import org.example.siljeun.domain.seatscheduleinfo.service.SeatScheduleInfoService;
 import org.example.siljeun.domain.user.entity.User;
 import org.example.siljeun.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -28,14 +29,13 @@ public class ReservationService {
   private final ReservationRepository reservationRepository;
   private final UserRepository userRepository;
   private final WaitingQueueService waitingQueueService;
-  private final SeatScheduleInfoRepository seatScheduleInfoRepository;
+  private final SeatScheduleInfoService seatScheduleInfoService;
 
   @Transactional
   public void save(Long userId, Long seatScheduleInfoId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-    SeatScheduleInfo seatScheduleInfo = seatScheduleInfoRepository.findById(seatScheduleInfoId)
-        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUNT_SEAT_SCHEDULE_INFO));
+    SeatScheduleInfo seatScheduleInfo = seatScheduleInfoService.findById(seatScheduleInfoId);
 
     Reservation reservation = new Reservation(user, seatScheduleInfo);
     reservationRepository.save(reservation);
@@ -68,8 +68,11 @@ public class ReservationService {
       throw new CustomException(ErrorCode.INVALID_RESERVATION_USER);
     }
 
+    Long seatScheduleInfoId = reservation.getSeatScheduleInfo().getId();
     reservationRepository.delete(reservation);
-    reservation.getSeatScheduleInfo().updateSeatScheduleInfoStatus(SeatStatus.AVAILABLE);
+
+    seatScheduleInfoService.updateSeatScheduleInfoStatus(seatScheduleInfoId, SeatStatus.AVAILABLE);
+    seatScheduleInfoService.applySeatLockTTL(seatScheduleInfoId, SeatStatus.AVAILABLE);
   }
 
   public ReservationInfoResponse findById(String username, Long reservationId) {

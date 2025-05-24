@@ -3,6 +3,8 @@ package org.example.siljeun.domain.seatscheduleinfo.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.siljeun.domain.reservation.exception.CustomException;
+import org.example.siljeun.domain.reservation.exception.ErrorCode;
 import org.example.siljeun.domain.schedule.entity.Schedule;
 import org.example.siljeun.domain.schedule.repository.ScheduleRepository;
 import org.example.siljeun.domain.seat.entity.Seat;
@@ -35,7 +37,7 @@ public class SeatScheduleInfoService {
 
         //예외 상황 처리
         SeatScheduleInfo seatScheduleInfo = seatScheduleInfoRepository.findById(seatScheduleInfoId).
-                orElseThrow(() -> new EntityNotFoundException("해당 회차별 좌석 정보가 존재하지 않습니다."));
+                orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUNT_SEAT_SCHEDULE_INFO));
 
         Schedule schedule = seatScheduleInfo.getSchedule();
         if(schedule.getTicketingStartTime().isAfter(LocalDateTime.now())){
@@ -65,7 +67,7 @@ public class SeatScheduleInfoService {
         redisTemplate.opsForValue().set(redisLockKey, userId.toString());
 
         //Redis 상태 변경
-        updateSeatSchedulerInfoStatusInRedis(scheduleId, seatScheduleInfoId, SeatStatus.SELECTED);
+        updateSeatScheduleInfoStatusInRedis(scheduleId, seatScheduleInfoId, SeatStatus.SELECTED);
 
         //TTL 적용
         applySeatLockTTL(seatScheduleInfoId, SeatStatus.SELECTED);
@@ -78,7 +80,7 @@ public class SeatScheduleInfoService {
 
         List<SeatScheduleInfo> seatScheduleInfos = seatScheduleInfoRepository.findAllBySchedule(schedule);
         if(seatScheduleInfos.isEmpty()){
-            throw new EntityNotFoundException("해당 회차별 좌석 정보가 존재하지 않습니다.");
+            throw new CustomException(ErrorCode.NOT_FOUNT_SEAT_SCHEDULE_INFO);
         }
 
         List<String> fieldKeys = seatScheduleInfos.stream()
@@ -118,14 +120,23 @@ public class SeatScheduleInfoService {
 
         redisTemplate.opsForHash().putAll(redisHashKey, seatStatusMap);
     }
+    @Transactional
+    public void updateSeatScheduleInfoStatus(Long seatScheduleInfoId, SeatStatus seatStatus){
+        SeatScheduleInfo seatScheduleInfo = seatScheduleInfoRepository.findById(seatScheduleInfoId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUNT_SEAT_SCHEDULE_INFO));
+        seatScheduleInfo.updateSeatScheduleInfoStatus(seatStatus);
 
-    public void updateSeatSchedulerInfoStatusInRedis(Long scheduleId, Long seatScheduleInfoId, SeatStatus seatStatus){
+        Long scheduleId = seatScheduleInfo.getSchedule().getId();
+        updateSeatScheduleInfoStatusInRedis(scheduleId, seatScheduleInfoId, seatStatus);
+    }
+
+    public void updateSeatScheduleInfoStatusInRedis(Long scheduleId, Long seatScheduleInfoId, SeatStatus seatStatus){
         String redisKey = RedisKeyProvider.seatStatusKey(scheduleId);
         String fieldKey = seatScheduleInfoId.toString();
         redisTemplate.opsForHash().put(redisKey, fieldKey, seatStatus);
     }
 
-    private void applySeatLockTTL(Long seatScheduleInfoId, SeatStatus seatStatus){
+    public void applySeatLockTTL(Long seatScheduleInfoId, SeatStatus seatStatus){
         String member = seatScheduleInfoId.toString();
 
         String seatLockkey = RedisKeyProvider.seatOccupyKey(seatScheduleInfoId);
@@ -153,5 +164,10 @@ public class SeatScheduleInfoService {
                 redisTemplate.persist(seatLockkey);
                 break;
         }
+    }
+
+    public SeatScheduleInfo findById(Long seatScheduleInfoId){
+        return seatScheduleInfoRepository.findById(seatScheduleInfoId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUNT_SEAT_SCHEDULE_INFO));
     }
 }
