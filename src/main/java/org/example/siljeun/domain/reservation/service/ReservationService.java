@@ -72,7 +72,7 @@ public class ReservationService {
     }
 
     reservationRepository.delete(reservation);
-    reservation.getSeatScheduleInfo().updateSeatScheduleInfoStatus(SeatStatus.CANCELLED);
+    reservation.getSeatScheduleInfo().updateSeatScheduleInfoStatus(SeatStatus.AVAILABLE);
   }
 
   public ReservationInfoResponse findById(String username, Long reservationId) {

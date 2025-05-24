@@ -33,11 +33,11 @@ public class SeatScheduleInfoService {
     @DistributedLock(key = "'seat:' + #seatScheduleInfoId")
     public void selectSeat(Long userId, Long scheduleId, Long seatScheduleInfoId) {
 
+        //예외 상황 처리
         SeatScheduleInfo seatScheduleInfo = seatScheduleInfoRepository.findById(seatScheduleInfoId).
                 orElseThrow(() -> new EntityNotFoundException("해당 회차별 좌석 정보가 존재하지 않습니다."));
 
         Schedule schedule = seatScheduleInfo.getSchedule();
-
         if(schedule.getTicketingStartTime().isAfter(LocalDateTime.now())){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "예매 불가능한 시간입니다. 예매 오픈 시간 : " + schedule.getTicketingStartTime());
         }
@@ -46,20 +46,29 @@ public class SeatScheduleInfoService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 선점된 좌석입니다.");
         }
 
-        seatScheduleInfo.updateSeatScheduleInfoStatus(SeatStatus.SELECTED);
-        seatScheduleInfoRepository.save(seatScheduleInfo);
-
         String redisSelectedKey = RedisKeyProvider.userSelectedSeatKey(userId, scheduleId);
-
         if (Boolean.TRUE.equals(redisTemplate.hasKey(redisSelectedKey))) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "1인당 1개의 좌석만 예약 가능합니다.");
         }
 
-        redisTemplate.opsForValue().set(redisSelectedKey, seatScheduleInfoId.toString());
+        //DB 상태 변경
+        seatScheduleInfo.updateSeatScheduleInfoStatus(SeatStatus.SELECTED);
+        seatScheduleInfoRepository.save(seatScheduleInfo);
+
+        //유저가 선점한 좌석을 Redis에 저장 (정보 조회용)
+        redisTemplate.opsForValue()
+                .set(redisSelectedKey, seatScheduleInfoId.toString());
         redisTemplate.expire(redisSelectedKey, Duration.ofMinutes(5));
 
-        String redisKey = RedisKeyProvider.seatStatusKey(scheduleId);
-        redisTemplate.opsForHash().put(redisKey, seatScheduleInfoId.toString(), SeatStatus.SELECTED.name());
+        //TTL 관리를 위한 키 생성
+        String redisLockKey = RedisKeyProvider.seatOccupyKey(seatScheduleInfoId);
+        redisTemplate.opsForValue().set(redisLockKey, userId.toString());
+
+        //Redis 상태 변경
+        updateSeatSchedulerInfoStatusInRedis(scheduleId, seatScheduleInfoId, SeatStatus.SELECTED);
+
+        //TTL 적용
+        applySeatLockTTL(seatScheduleInfoId, SeatStatus.SELECTED);
     }
 
     public Map<String, String> getSeatStatusMap(Long scheduleId) {
@@ -67,8 +76,10 @@ public class SeatScheduleInfoService {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 회차가 존재하지 않습니다."));
 
-        List<SeatScheduleInfo> seatScheduleInfos =
-                seatScheduleInfoRepository.findAllBySchedule(schedule);
+        List<SeatScheduleInfo> seatScheduleInfos = seatScheduleInfoRepository.findAllBySchedule(schedule);
+        if(seatScheduleInfos.isEmpty()){
+            throw new EntityNotFoundException("해당 회차별 좌석 정보가 존재하지 않습니다.");
+        }
 
         List<String> fieldKeys = seatScheduleInfos.stream()
                 .map(info -> info.getId().toString())
@@ -76,8 +87,8 @@ public class SeatScheduleInfoService {
 
         String redisKey = RedisKeyProvider.seatStatusKey(scheduleId);
         List<Object> redisStatuses = redisTemplate.opsForHash().multiGet(redisKey, new ArrayList<>(fieldKeys));
-        Map<String, String> seatStatusMap = new HashMap<>();
 
+        Map<String, String> seatStatusMap = new HashMap<>();
         for (int i = 0; i < seatScheduleInfos.size(); i++) {
             SeatScheduleInfo info = seatScheduleInfos.get(i);
             Object redisStatusObj = redisStatuses.get(i);
@@ -108,18 +119,39 @@ public class SeatScheduleInfoService {
         redisTemplate.opsForHash().putAll(redisHashKey, seatStatusMap);
     }
 
-    @Transactional
-    public void updateSeatSchedulerInfoStatus(Long seatScheduleInfoId, SeatStatus seatStatus){
-
-        SeatScheduleInfo seatScheduleInfo = seatScheduleInfoRepository.findById(seatScheduleInfoId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 회차별 좌석 정보가 존재하지 않습니다."));
-
-        Long scheduleId = seatScheduleInfo.getSchedule().getId();
+    public void updateSeatSchedulerInfoStatusInRedis(Long scheduleId, Long seatScheduleInfoId, SeatStatus seatStatus){
         String redisKey = RedisKeyProvider.seatStatusKey(scheduleId);
         String fieldKey = seatScheduleInfoId.toString();
+        redisTemplate.opsForHash().put(redisKey, fieldKey, seatStatus);
+    }
 
-        String status = (String) redisTemplate.opsForHash().get(redisKey, fieldKey);
+    private void applySeatLockTTL(Long seatScheduleInfoId, SeatStatus seatStatus){
+        String member = seatScheduleInfoId.toString();
 
-        seatScheduleInfo.updateSeatScheduleInfoStatus(seatStatus);
+        String seatLockkey = RedisKeyProvider.seatOccupyKey(seatScheduleInfoId);
+        String zsetSelectedKey = RedisKeyProvider.trackExpiresKey(SeatStatus.SELECTED.name());
+        String zsetHoldKey = RedisKeyProvider.trackExpiresKey(SeatStatus.HOLD.name());
+
+        Duration ttl = null;
+        long nowMillis = System.currentTimeMillis();
+
+        redisTemplate.opsForZSet().remove(zsetSelectedKey, member);
+        redisTemplate.opsForZSet().remove(zsetHoldKey, member);
+
+        switch(seatStatus){
+            case SELECTED:
+                ttl = Duration.ofMinutes(5);
+                redisTemplate.expire(seatLockkey, ttl);
+                redisTemplate.opsForZSet().add(zsetSelectedKey, member, nowMillis+ttl.toMillis());
+                break;
+            case HOLD:
+                ttl = Duration.ofMinutes(60);
+                redisTemplate.expire(seatLockkey, ttl);
+                redisTemplate.opsForZSet().add(zsetHoldKey, member, nowMillis+ttl.toMillis());
+                break;
+            default:
+                redisTemplate.persist(seatLockkey);
+                break;
+        }
     }
 }

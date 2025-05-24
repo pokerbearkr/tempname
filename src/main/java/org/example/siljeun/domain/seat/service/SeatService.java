@@ -15,12 +15,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class SeatService {
 
     private final VenueRepository venueRepository;
     private final SeatRepository seatRepository;
 
-    @Transactional
     public void createSeats(Long venueId, List<SeatCreateRequest> seatCreateRequests){
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 공연장을 찾을 수 없습니다."));         //Throw 예외 설정 필요
