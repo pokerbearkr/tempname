@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
   private final JwtUtil jwtUtil;
@@ -21,6 +23,8 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
+    log.debug("----- 로그인 성공 -----");
+
     // principal에서 사용자 정보 추출
     OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
     String username = "kakao_" + oAuth2User.getAttribute("id").toString();
@@ -41,6 +45,9 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     response.setStatus(HttpServletResponse.SC_OK);
     response.getWriter().write("{\"message\": \"Login successful\"}");
     response.getWriter().flush();
+
+    // 기본 경로로 리다이렉트
+    response.sendRedirect("/");
   }
 
 }
