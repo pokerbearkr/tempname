@@ -1,9 +1,10 @@
-package org.example.siljeun.domain.venue.controller;
+package org.example.siljeun.domain.seat.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.siljeun.domain.seat.dto.request.SeatCreateRequest;
-import org.example.siljeun.domain.venue.service.VenueSeatService;
+import org.example.siljeun.domain.seat.service.SeatService;
+import org.example.siljeun.global.dto.ResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,17 +17,17 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/venues")
-public class VenueSeatController {
+public class SeatController {
 
-    private final VenueSeatService venueSeatService;
+    private final SeatService seatService;
 
     //좌석 정보를 CSV 파일 또는 GUI로 다수의 정보를 한번에 등록한다.
     @PostMapping("/{venueId}/seats")
-    public ResponseEntity<Void> createVenueSeats(
+    public ResponseEntity<ResponseDto<Void>> createVenueSeats(
             @PathVariable Long venueId,
             @RequestBody @Valid List<SeatCreateRequest> seatCreateRequests
     ){
-        venueSeatService.createSeats(venueId, seatCreateRequests);
-        return ResponseEntity.ok().build();
+        seatService.createSeats(venueId, seatCreateRequests);
+        return ResponseEntity.ok(ResponseDto.success("좌석 정보가 등록되었습니다.", null));
     }
 }

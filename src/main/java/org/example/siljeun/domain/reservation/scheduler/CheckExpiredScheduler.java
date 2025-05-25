@@ -28,10 +28,13 @@ public class CheckExpiredScheduler {
   private final Set<String> keys = new HashSet<>();
 
   // 1시간마다 티켓팅 기간인 schedule을 keys에 저장
+  // Todo : 동시성 문제는 clear() 떄문에 발생(redis 자체는 동시성 문제 없음)
   @Scheduled(cron = "0 0 * * * *")
   public void checkOpenedSchedule() {
 
-    keys.clear();
+    keys.clear(); // checkExpired()랑 동시에 돌다가 얘가 좀 더 빨리 돌면 clear()돼서 비어있는걸 checkExpired 하게됨 -> 동시성 문제
+
+    // 데이터 조회할 때는 부하 방지를 위해 키가 일치하는 경우만 조회 (like 검색 실무에선 못씀.)
 
     List<Long> openedSchedules = scheduleRepository.findAllByStartTimeAfterAndTicketingStartTimeBefore(
             LocalDateTime.now(),

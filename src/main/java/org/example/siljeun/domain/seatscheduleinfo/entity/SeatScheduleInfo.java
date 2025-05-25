@@ -1,4 +1,4 @@
-package org.example.siljeun.domain.seat.entity;
+package org.example.siljeun.domain.seatscheduleinfo.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.siljeun.domain.schedule.entity.Schedule;
+import org.example.siljeun.domain.seat.entity.Seat;
 import org.example.siljeun.domain.seat.enums.SeatStatus;
 import org.example.siljeun.global.entity.BaseEntity;
 
