@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: siljeun
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testDB;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: root
+    password: 0000
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+h2:
+  console:
+    enabled: true
+    path: /h2-console
+
+kakao:
+  client-id: eaee0e144aeb9afef54d5c449448baea # ??? REST API ?
+  redirect-uri: http://localhost:8080/oauth/kakao/callback
+  token-uri: https://kauth.kakao.com/oauth/token
+  user-info-uri: https://kapi.kakao.com/v2/user/me
+
+server:
+  port: 8080
+
+toss:
+  client-key: test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm
+  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
+jwt:
+  secret:
+    key: OUpWdGF6SnY2SVk0aXYxa1FHM3dOdTk2VFVDMVhLNGM=
