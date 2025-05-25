@@ -1,6 +1,7 @@
 package org.example.siljeun.domain.auth.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.siljeun.domain.auth.dto.request.LoginRequest;
 import org.example.siljeun.domain.auth.dto.request.SignUpRequest;
 import org.example.siljeun.domain.auth.dto.response.LoginResponse;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
   private final AuthService authService;
@@ -33,6 +35,7 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseDto<LoginResponse> login(@RequestBody LoginRequest request) {
     try {
+      log.debug("----- 로그인 메서드 실행 -----");
       LoginResponse response = authService.login(request.username(), request.password());
       return ResponseDto.success("로그인 성공", response);
     } catch (Exception e) {

@@ -1,6 +1,8 @@
 package org.example.siljeun.domain.seat.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.siljeun.domain.reservation.exception.CustomException;
+import org.example.siljeun.domain.reservation.exception.ErrorCode;
 import org.example.siljeun.domain.seat.dto.request.SeatCreateRequest;
 import org.example.siljeun.domain.seat.entity.Seat;
 import org.example.siljeun.domain.venue.entity.Venue;
@@ -15,18 +17,18 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class SeatService {
 
     private final VenueRepository venueRepository;
     private final SeatRepository seatRepository;
 
-    @Transactional
     public void createSeats(Long venueId, List<SeatCreateRequest> seatCreateRequests){
         Venue venue = venueRepository.findById(venueId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 공연장을 찾을 수 없습니다."));         //Throw 예외 설정 필요
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_VENUE));
 
         if (seatCreateRequests.size() > venue.getSeatCapacity()) {
-            throw new IllegalArgumentException("좌석 수가 공연장 수용 인원(capacity)을 초과했습니다.");
+            throw new CustomException(ErrorCode.SEAT_CAPACITY_EXCEEDED);
         }
         //공연장 ID, 구역, 열, 번호를 바탕으로 고유하도록 설정하였으나
         //좌석 정보가 중복되는 경우를 다루지 않아 추후 리팩토링이 필요함

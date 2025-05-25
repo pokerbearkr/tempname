@@ -24,8 +24,8 @@ public class AuthService {
     String password = passwordEncoder.encode(request.password());
 
     // 회원 생성 및 저장
-    User user = new User(request.email(), request.username(), password, request.nickname(),
-        request.role(), request.provider());
+    User user = new User(request.email(), request.username(), password, request.name(),
+        request.nickname(), request.role(), request.provider());
     User savedUser = userRepository.save(user);
 
     return new SignUpResponse(savedUser.getId(), savedUser.getEmail(), savedUser.getUsername());

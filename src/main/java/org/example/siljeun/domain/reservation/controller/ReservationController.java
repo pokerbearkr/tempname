@@ -44,13 +44,4 @@ public class ReservationController {
     ReservationInfoResponse dto = reservationService.findById(username, reservationId);
     return ResponseEntity.ok(ResponseDto.success("예매 조회 성공", dto));
   }
-
-  @PostMapping()
-  public ResponseEntity<ResponseDto<Void>> createReservation(
-          @RequestBody @Valid ReservationCreateRequest reservationCreateRequest,
-          @AuthenticationPrincipal PrincipalDetails userDetails
-  ){
-    reservationService.createReservation(reservationCreateRequest, userDetails.getUserId());
-    return ResponseEntity.ok(ResponseDto.success("결제 진행하기", null));
-  }
 }
