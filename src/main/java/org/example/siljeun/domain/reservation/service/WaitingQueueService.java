@@ -110,10 +110,11 @@ public class WaitingQueueService {
       String destination = "/topic/queue/" + scheduleId + "/" + username;
       MyQueueInfoResponse response = new MyQueueInfoResponse(scheduleId, username, rank,
           true);
-      messagingTemplate.convertAndSend(destination, response);
 
       addSelectingQueue(scheduleId, username);
       deleteWaitingUser(scheduleId, username);
+
+      messagingTemplate.convertAndSend(destination, response);
 
       return;
     }
