@@ -24,7 +24,7 @@ class WaitingQueueServiceTest {
 
   @Test
   @Transactional
-  void addWaitingQueue() {
+  void _1001명_대기시_1001번째_유저가_대기0순위() {
     // given
     ZSetOperations<String, String> zSet = redisTemplate.opsForZSet();
 
@@ -33,13 +33,31 @@ class WaitingQueueServiceTest {
     }
 
     // when
-    Long score = zSet.rank(waitingQueueService.prefixKeyForWaitingQueue + 1L, "user1001");
+    Long rank = zSet.rank(waitingQueueService.prefixKeyForWaitingQueue + 1L, "user1001");
 
     // then
-    assertThat(score).isEqualTo(0);
+    assertThat(rank).isEqualTo(0);
   }
 
   @Test
-  void deleteWaitingUser() {
+  @Transactional
+  void selectingQueue에서_1명나가면_1002번이_대기0순위() {
+    // given
+    ZSetOperations<String, String> zSet = redisTemplate.opsForZSet();
+    waitingQueueService.addWaitingQueue(1L, "user1002");
+
+    // when
+    waitingQueueService.deleteSelectingUser(1L, "user1000");
+
+    Long rank1001AtWaiting = zSet.rank(waitingQueueService.prefixKeyForWaitingQueue + 1L,
+        "user1001");
+    Long rank1001AtSelecting = zSet.rank(waitingQueueService.prefixKeyForSelecingQueue + 1L,
+        "user1001");
+    Long rank1002 = zSet.rank(waitingQueueService.prefixKeyForWaitingQueue + 1L, "user1002");
+
+    // then
+    assertThat(rank1001AtWaiting).isEqualTo(null);
+    assertThat(rank1001AtSelecting).isEqualTo(999);
+    assertThat(rank1002).isEqualTo(0);
   }
 }
