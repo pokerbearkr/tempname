@@ -23,13 +23,12 @@ import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+//@ActiveProfiles("test")
 public class WebSocketTest {
 
   @LocalServerPort
@@ -71,11 +70,10 @@ public class WebSocketTest {
     stompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
     URI uri = new URI(
-        "ws://localhost:" + port + "/ws?scheduleId=" + savedSchedule.getId() + "&token="
-            + validToken);
+        "ws://localhost:" + port + "/ws?scheduleId=" + savedSchedule.getId());
 
     WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
-    webSocketHttpHeaders.add("Authorization", JwtUtil.BEARER_PREFIX + validToken);
+    webSocketHttpHeaders.add("Authorization", validToken);
 
     StompHeaders stompHeaders = new StompHeaders();
 
