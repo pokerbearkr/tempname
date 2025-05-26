@@ -32,7 +32,8 @@ public enum ErrorCode {
 
   // queue
   QUEUE_INSERT_FAIL(500, "대기열 등록을 실패했습니다."),
-  NOT_TICKETING_TIME(400, "예매 가능 시간이 아닙니다.");
+  NOT_TICKETING_TIME(400, "예매 가능 시간이 아닙니다."),
+  PRECONDITION_REQUIRED(400, "선행 조건이 수행되지 않았습니다.");
 
   private HttpStatus code;
   private String message;

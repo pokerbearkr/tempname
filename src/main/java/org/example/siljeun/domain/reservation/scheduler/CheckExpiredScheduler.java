@@ -27,11 +27,8 @@ public class CheckExpiredScheduler {
 
   private final Set<String> keys = new HashSet<>();
 
-  // 1시간마다 티켓팅 기간인 schedule을 keys에 저장
   @Scheduled(cron = "0 0 * * * *")
   public void checkOpenedSchedule() {
-
-    keys.clear();
 
     List<Long> openedSchedules = scheduleRepository.findAllByStartTimeAfterAndTicketingStartTimeBefore(
             LocalDateTime.now(),
