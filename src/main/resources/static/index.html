@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>토스 결제 테스트</title>
+
+    <!-- ✅ 반드시 여기에 Toss SDK를 먼저 선언 -->
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+
+    <!-- ✅ 그리고 defer로 내 스크립트는 나중에 실행 -->
+    <script defer src="/index.js"></script>
+</head>
+<body>
+<h2>결제 테스트</h2>
+<div id="payment-method" style="margin-bottom: 20px;"></div>
+<div id="agreement" style="margin-bottom: 20px;"></div>
+<button id="payment-request-button">결제하기</button>
+</body>
+</html>
