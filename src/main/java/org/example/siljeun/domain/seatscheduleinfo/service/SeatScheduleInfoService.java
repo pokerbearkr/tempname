@@ -84,7 +84,7 @@ public class SeatScheduleInfoService {
     //TTL 적용
     applySeatLockTTL(seatScheduleInfoId, SeatStatus.SELECTED);
 
-    //좌석 선택중인 유저 queue에서 데이터 삭제
+    //좌석 선택 queue에서 데이터 삭제
     waitingQueueService.addSelectingQueue(scheduleId, user.getUsername());
   }
 
@@ -116,7 +116,7 @@ public class SeatScheduleInfoService {
           ? redisStatusObj.toString()
           : seatScheduleInfos.get(i).getStatus().name();
 
-      seatStatusMap.put("seatScheduleInfo-" + info.getId().toString(), status);
+      seatStatusMap.put(info.getId().toString(), status);
     }
 
     return seatStatusMap;
@@ -152,7 +152,7 @@ public class SeatScheduleInfoService {
       SeatStatus seatStatus) {
     String redisKey = RedisKeyProvider.seatStatusKey(scheduleId);
     String fieldKey = seatScheduleInfoId.toString();
-    redisTemplate.opsForHash().put(redisKey, fieldKey, seatStatus);
+    redisTemplate.opsForHash().put(redisKey, fieldKey, seatStatus.name());
   }
 
   public void applySeatLockTTL(Long seatScheduleInfoId, SeatStatus seatStatus) {
