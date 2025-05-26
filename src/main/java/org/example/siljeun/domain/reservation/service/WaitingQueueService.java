@@ -126,7 +126,7 @@ public class WaitingQueueService {
   }
 
   // 대기중인 모든 사용자에게 랭킹 및 대기번호 전송
-  // Todo : redis pubsub -> disconnectListener에서 publish
+  // redis pubsub -> disconnectListener에서 publish
   public void sendAllWaitingNumber(Long scheduleId) {
     String key = prefixKeyForWaitingQueue + scheduleId;
 
