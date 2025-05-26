@@ -54,7 +54,7 @@ public class SeatExpirationScheduler {
             String hashKey = RedisKeyProvider.seatStatusKey(info.getSchedule().getId());
             hashBatch
                     .computeIfAbsent(hashKey, k -> new HashMap<>())
-                    .put(info.getId().toString(), SeatStatus.AVAILABLE);
+                    .put(info.getId().toString(), SeatStatus.AVAILABLE.name());
         }
 
         RedisCallback<Object> pipelineWork = connection -> {

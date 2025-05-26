@@ -60,17 +60,18 @@ public class SeatScheduleInfoService {
         //유저가 선점한 좌석을 Redis에 저장 (정보 조회용)
         redisTemplate.opsForValue()
                 .set(redisSelectedKey, seatScheduleInfoId.toString());
-        redisTemplate.expire(redisSelectedKey, Duration.ofMinutes(5));
+        redisTemplate.expire(redisSelectedKey, Duration.ofMinutes(1));
 
         //TTL 관리를 위한 키 생성
         String redisLockKey = RedisKeyProvider.seatOccupyKey(seatScheduleInfoId);
         redisTemplate.opsForValue().set(redisLockKey, userId.toString());
-
+        log.info("Redis 상태 변경 시작");
         //Redis 상태 변경
         updateSeatScheduleInfoStatusInRedis(scheduleId, seatScheduleInfoId, SeatStatus.SELECTED);
-
+        log.info("Redis 상태 변경 끝");
         //TTL 적용
         applySeatLockTTL(seatScheduleInfoId, SeatStatus.SELECTED);
+        log.info("추적 시작");
     }
 
     public Map<String, String> getSeatStatusMap(Long scheduleId) {
@@ -99,7 +100,7 @@ public class SeatScheduleInfoService {
                     ? redisStatusObj.toString()
                     : seatScheduleInfos.get(i).getStatus().name();
 
-            seatStatusMap.put("seatScheduleInfo-" + info.getId().toString(), status);
+            seatStatusMap.put(info.getId().toString(), status);
         }
 
         return seatStatusMap;
@@ -133,7 +134,7 @@ public class SeatScheduleInfoService {
     public void updateSeatScheduleInfoStatusInRedis(Long scheduleId, Long seatScheduleInfoId, SeatStatus seatStatus){
         String redisKey = RedisKeyProvider.seatStatusKey(scheduleId);
         String fieldKey = seatScheduleInfoId.toString();
-        redisTemplate.opsForHash().put(redisKey, fieldKey, seatStatus);
+        redisTemplate.opsForHash().put(redisKey, fieldKey, seatStatus.name());
     }
 
     public void applySeatLockTTL(Long seatScheduleInfoId, SeatStatus seatStatus){
@@ -151,7 +152,7 @@ public class SeatScheduleInfoService {
 
         switch(seatStatus){
             case SELECTED:
-                ttl = Duration.ofMinutes(5);
+                ttl = Duration.ofMinutes(1);
                 redisTemplate.expire(seatLockkey, ttl);
                 redisTemplate.opsForZSet().add(zsetSelectedKey, member, nowMillis+ttl.toMillis());
                 break;
